@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Metas -->
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,maximum-scale=1,user-scalable=no"
+    />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="referrer" referrerpolicy="strict-origin-when-cross-origin" />
+    <meta
+      name="title"
+      content="ShorestRoute | Open Route Planner for 2+ Stops"
+    />
+    <meta
+      name="description"
+      content="ShortestRoute finds for you the optimal route and directions for two or more stops on a map including routing profiles like walking, biking and car."
+    />
+    <meta
+      name="keywords"
+      content="free, open, router, route planning, trip planner, transport planning, interactive maps solution, find the shortest route, multiple waypoint optimization, get optimized and accurate routing solutions, exact travel time and directions"
+    />
+    <meta name="robots" content="index, follow" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta name="language" content="English" />
+
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="./resources/favicon/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="./resources/favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="./resources/favicon/favicon-16x16.png"
+    />
+    <link rel="manifest" href="./resources/favicon/site.webmanifest" />
+    <!-- Title -->
+    <title>ShortestRoute v0.95</title>
+    <!-- Leaflet -->
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.min.css"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/leaflet@1.9.3/dist/leaflet.min.js"></script>
+    <!-- Leaflet Plugins -->
+    <script src="./scripts/leaflet-providers.js"></script>
+    <script src="./scripts/leaflet.rainviewer.js"></script>
+    <script src="./scripts/Leaflet.fullscreen.min.js"></script>
+    <script src="./scripts/leaflet-beautify-marker-icon.js"></script>
+    <script src="./scripts/leaflet.control.detaillevel.js"></script>
+    <script src="./scripts/leaflet-routing-machine.js"></script>
+    <script
+      src="./scripts/Leaflet.OSMBuildings.js"
+      crossorigin="anonymous"
+    ></script>
+    <script src="./scripts/Leaflet.Control.Locate.min.js"></script>
+    <script src="./scripts/leaflet-minimap.js"></script>
+    <script src="./scripts/leaflet-simple-map-screenshoter.min.js"></script>
+    <link href=" ./styles/leaflet-beautify-marker-icon.css" rel="stylesheet" />
+    <link href=" ./styles/Leaflet.Control.Locate.min.css" rel="stylesheet" />
+    <link href=" ./styles/leaflet-minimap.css" rel="stylesheet" />
+    <!-- Bootstrap -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+      integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css"
+    />
+    <!-- Fontawesome-->
+    <script src="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.3.0/js/fontawesome.min.js"></script>
+    <link
+      href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.3.0/css/fontawesome.min.css"
+      rel="stylesheet"
+    />
+    <!-- Axios -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/axios@1.3/dist/axios.min.js"
+      crossorigin="anonymous"
+    ></script>
+    <!-- ChartJS -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Papaparse -->
+    <script src="./scripts/ext.papaparse.js"></script>
+    <!-- HTML2PDF -->
+    <script src="./scripts/ext.html2pdf.js"></script>
+    <!-- 2GPX -->
+    <script src="./scripts/ext.togpx.js"></script>
+    <!-- Captcha -->
+    <script src="https://cdn.jsdelivr.net/npm/vanilla-hcaptcha"></script>
+    <!-- CookieConsent CSS -->
+    <link rel="stylesheet" href="./styles/ext.cookieconsent.css" />
+    <!-- Analytics -->
+    <script
+      data-goatcounter="https://shortestroute.goatcounter.com/count"
+      async
+      src="//gc.zgo.at/count.js"
+    ></script>
+    <!-- Custom CSS -->
+ <style>
+      /* Fonts */
+
+      @font-face {
+        font-family: "Open Sans";
+        src: url(./styles/Fonts/Open_Sans/static/OpenSans-Regular.ttf);
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      @font-face {
+        font-family: "Roboto";
+        src: url(./styles/Fonts/Roboto/Roboto-Regular.ttf);
+        font-weight: normal;
+        font-style: normal;
+      }
+
+      /* Start */
+
+      * {
+        box-sizing: border-box;
+        font-family: "Open Sans", "Roboto", Arial;
+      }
+
+      body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+      }
+
+      /* Leaflet */
+
+      #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        width: 100%;
+        z-index: -5;
+      }
+
+      .leaflet-routing-container.leaflet-bar.leaflet-control,
+      .leaflet-control-rainviewer.leaflet-bar.leaflet-control,
+      .leaflet-control-zoom.leaflet-bar.leaflet-control,
+      .leaflet-bar.leaflet-control.leaflet-control-custom,
+      .leaflet-control-simpleMapScreenshoter.leaflet-control,
+      .leaflet-control-locate.leaflet-bar.leaflet-control {
+        display: none;
+      }
+
+      /* Icons, buttons, anchors */
+
+      i {
+        cursor: pointer;
+      }
+
+      #locIcon {
+        color: #7c7c7cd5;
+      }
+
+      .bi.bi-x-square {
+        font-weight: bold;
+      }
+
+      .tag {
+        margin-right: 1rem;
+      }
+
+      button {
+        min-width: 2.5rem;
+        min-height: 2.5rem;
+        opacity: 0.9;
+      }
+
+      #infoBtn:focus,
+      #infoBtn:active {
+        box-shadow: none;
+      }
+
+      #ppAnchor:hover,
+      #tosAnchor:hover {
+        cursor: pointer;
+      }
+
+      #smallPinBtn,
+      #locationBtn,
+      #smallDelBtn,
+      #smallNavBtn,
+      #smallReturnBtn,
+      #smallRouteBtn,
+      #smallQuestionBtn,
+      #nightBtn2 {
+        visibility: hidden;
+      }
+
+      .btn-group-vehicle,
+      .btn-group-planning,
+      .btn-group-map,
+      .btn-group-settings {
+        position: relative;
+      }
+
+      #actionBtns > *,
+      #actionBtns2 > *,
+      #filterInput,
+      #sortFilterBtn,
+      #deleteFilterBtn {
+        border: 1px solid lightgray;
+      }
+
+      #dropdownBtn {
+        border-right: 1px solid white;
+      }
+
+      #mapItems > * {
+        padding: 0.25rem 0.25rem;
+      }
+
+      .controllBtns {
+        min-width: 2rem;
+        min-height: 2rem;
+      }
+
+      .svgGreen {
+        filter: invert(41%) sepia(80%) saturate(455%) hue-rotate(71deg)
+          brightness(99%) contrast(85%);
+        transform: scaleX(-1);
+      }
+
+      #contactAnchor {
+        text-decoration: none;
+        color: inherit;
+      }
+
+      .navbar-toggler-icon {
+        background-image: url(/resources/svg/info-solid.svg) !important;
+        background-size: 15px;
+        filter: invert(55%);
+      }
+
+      /* Nav */
+
+      nav {
+        z-index: 2;
+        opacity: 0.96;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+      }
+
+      .active-cont {
+        margin-left: 400px;
+      }
+
+      .dropdown-menu {
+        position: absolute;
+      }
+
+      .dropdown-menu > * {
+        display: flex;
+        flex-direction: row;
+      }
+
+      #logo {
+        display: flex;
+      }
+
+      .badgeLogo {
+        font-size: smaller !important;
+      }
+
+      .nav-rotated {
+        transform: rotate(-180deg);
+      }
+
+      .navbar-toggle {
+        padding: 4px 3px !important;
+      }
+
+      /* Searchbar */
+
+      .searchContainer {
+        width: auto;
+      }
+
+      #searchBar {
+        width: 20vw;
+      }
+
+      .card {
+        visibility: visible;
+        position: absolute;
+        margin: auto auto;
+        width: 20vw;
+        border: none;
+        border-radius: 0;
+        z-index: 25 !important;
+      }
+
+      /* Sidebar (left) [added p-70 for overflow-y]*/
+
+      .side-navbar {
+        z-index: 2;
+        width: 25%;
+        margin-left: -100%;
+        padding: 0 0.5rem;
+        padding-bottom: 70px;
+        height: 100vh;
+        opacity: 0.96;
+        position: fixed;
+        transition: 0.8s;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15),
+          inset 0 -1px 0 rgba(255, 255, 255, 0.15);
+      }
+
+      #container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        margin: auto auto;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+
+      .backgroundImage {
+        padding-bottom: 10px;
+        opacity: 0.96;
+        filter: invert(75%);
+      }
+
+      #sidebar-wrapper {
+        overflow-y: scroll;
+        overflow-x: hidden;
+      }
+
+      #accordionPanelsStayOpenExample {
+        width: inherit;
+        padding: 0;
+      }
+
+      .nav-link {
+        background-color: white;
+      }
+
+      .my-container {
+        transition: 0.8s;
+      }
+
+      .active-nav {
+        margin-left: 0;
+      }
+
+      .listgroup {
+        position: relative;
+        visibility: visible;
+        z-index: 1;
+        min-width: 20%;
+      }
+
+      .summaryTitle {
+        text-transform: capitalize;
+      }
+
+      #actionArea {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .sidebarActionText {
+        display: flex;
+        flex-direction: row;
+        justify-content: center;
+        align-items: center;
+        font-size: smaller;
+      }
+
+      .sidebarActionText > * {
+        padding: 0 0.1rem;
+      }
+
+      #badgeMarkerCount {
+        z-index: 30;
+        margin-left: 3px;
+      }
+
+      .carou-padding {
+        padding: 0 1rem;
+      }
+
+      /* Responsiveness */
+
+      @media screen and (max-width: 750px) {
+        #logo,
+        .leaflet-bottom.leaflet-right {
+          display: none;
+        }
+        #smallPinBtn,
+        #smallDelBtn,
+        #smallNavBtn,
+        #smallReturnBtn,
+        #smallRouteBtn,
+        #smallQuestionBtn,
+        #nightBtn2 {
+          visibility: visible;
+        }
+        #actionArea {
+          display: none;
+        }
+        #actionBtns,
+        #actionBtns2 {
+          width: 90%;
+        }
+        #featBtns {
+          display: none;
+        }
+        #searchBar {
+          width: 11rem;
+        }
+        #infoBtn {
+          padding: 0 0;
+        }
+
+        #configArea {
+          margin-top: 0.75rem;
+        }
+        .card {
+          width: 52vw;
+        }
+        .side-navbar {
+          width: 100%;
+        }
+        #toastField {
+          visibility: hidden;
+        }
+      }
+
+      @media screen and (min-width: 751px) and (max-width: 1000px) {
+        #logo {
+          display: none;
+        }
+        #smallDelBtn {
+          visibility: visible;
+        }
+        #searchBar {
+          width: auto;
+        }
+        .card {
+          width: 32%;
+        }
+        .side-navbar {
+          width: 60%;
+        }
+      }
+
+      @media screen and (min-width: 1001px) and (max-width: 1200px) {
+        #searchBar {
+          width: auto;
+        }
+        .card {
+          width: 26%;
+        }
+        .side-navbar {
+          width: 40%;
+        }
+      }
+
+      @media screen and (min-width: 1201px) and (max-width: 1500px) {
+        #searchBar {
+          width: 23vw;
+        }
+        .card {
+          width: 26%;
+        }
+        .side-navbar {
+          width: 35%;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- Leaflet Map -->
+    <div id="map"></div>
+    <!-- Navbar -->
+    <nav class="navbar bg-light" id="navbar">
+      <div class="container-fluid">
+        <button
+          class="navbar-toggler ms-1 me-3 btn-outline-primary"
+          type="button"
+          id="infoBtn"
+        >
+          <span class="navbar-toggler-icon" id="navbar-toggler-icon"></span>
+        </button>
+        <a class="navbar-brand d-row me-5 ms-0" id="logo">
+          <img
+            src="./resources/svg/leaf.svg"
+            class="svgGreen me-2"
+            alt="logo leaf"
+            height="30"
+            width="30"
+            id="logoLeaf"
+          />
+          <div class="logoText d-flex d-row">
+            <b>ShortestRoute</b>
+            <h6>
+              <span class="badge text-bg-success ms-2 text-wrap badgeLogo">
+                v0.95
+              </span>
+            </h6>
+          </div>
+        </a>
+        <!-- Search -->
+        <div class="searchContainer me-auto ms-auto">
+          <div class="search" id="search">
+            <form class="input-group" role="search">
+              <input
+                type="text"
+                class="form-control"
+                id="searchBar"
+                placeholder="Search.."
+                aria-label="Search.."
+                onkeypress="Javascript: if (event.keyCode==13) getGeoData(event);"
+              />
+              <button
+                type="button"
+                class="btn btn btn-outline-primary"
+                id="searchBtn"
+                onclick="getGeoData(event)"
+              >
+                <i class="bi bi-search"></i>
+              </button>
+              <button
+                type="button"
+                class="btn btn btn-outline-primary"
+                id="deleteBtn"
+                onclick="clearSearchBar()"
+              >
+                <i class="bi bi-backspace-fill"></i>
+              </button>
+            </form>
+          </div>
+          <!-- Search results -->
+          <div class="card" id="card"></div>
+        </div>
+        <!-- Navbar: Toggler -->
+        <div class="me-auto ms-auto" id="featBtns">
+          <button type="button" class="btn btn-light" id="nightBtn">
+            <i class="bi bi-moon-stars-fill" id="moonIcon"></i>
+          </button>
+          <button
+            type="button"
+            class="btn btn-light"
+            id="questionBtn"
+            data-bs-toggle="modal"
+            data-bs-target="#exampleModal"
+          >
+            <i class="bi bi-question-lg"></i>
+          </button>
+        </div>
+      </div>
+    </nav>
+    <!-- Toasts -->
+    <div
+      class="toast-container position-fixed bottom-0 start-50 p-1"
+      id="toastField"
+    ></div>
+    <!-- Captcha -->
+    <div
+      class="modal fade"
+      id="captchaFrame"
+      tabindex="-1"
+      aria-labelledby="captchaModal"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered" style="width: 340px">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="captchaModal">Are You a Human?</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              id="closeCaptchaModal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <h-captcha
+              id="captchaStuff"
+              site-key="a5142f2d-75af-427b-97d8-ca8fe990b4ed"
+              size="normal"
+              tabindex="0"
+              theme="dark"
+            ></h-captcha>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Upload -->
+    <div
+      class="modal fade"
+      id="upload"
+      tabindex="-1"
+      aria-labelledby="uploadModal"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered" id="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title">Import Address Data</h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+              id="closeModal"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <label for="formFileLg" class="form-label"
+              >Import a comma-seperated file (.CSV):
+            </label>
+            <input
+              class="form-control form-control-lg"
+              id="csvInput"
+              type="file"
+            />
+          </div>
+          <div class="modal-body">
+            Entry format: "Street, Place, Zip, Country" (<a
+              href="./resources/data/addresses.csv"
+              download
+              >template</a
+            >)
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ToS -->
+    <div
+      class="modal fade"
+      id="tosModal"
+      tabindex="-1"
+      aria-labelledby="termsOfService"
+      aria-hidden="true"
+    >
+      <div
+        class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"
+      >
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              <h4>Terms of Use</h4>
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" id="contentTos"></div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- PP -->
+    <div
+      class="modal fade"
+      id="ppModal"
+      tabindex="-1"
+      aria-labelledby="PrivacyPolicy"
+      aria-hidden="true"
+    >
+      <div
+        class="modal-dialog modal-dialog-centered modal-dialog-scrollable modal-xl"
+      >
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">
+              <h4>Privacy Policy</h4>
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body" id="contentPp"></div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Sidebar -->
+    <div
+      class="side-navbar active-nav d-flex justify-content-between flex-column bg-light"
+      id="sidebar-wrapper"
+    >
+      <div class="nav flex-column w-100 m-1">
+        <div
+          class="input-group rounded p-2 d-flex d-col justify-content-center"
+          id="configArea"
+        >
+          <div class="btn-group" role="group" aria-label="menu">
+            <button
+              class="btn btn-light dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              id="mapLayerBtn"
+            >
+              Mapstyle
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="exampleRadiosMaps"
+                      id="map0"
+                      value="option000"
+                    />
+                    <label class="form-check-label" for="map0"> Dark </label>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="exampleRadiosMaps"
+                      id="map1"
+                      value="option111"
+                    />
+                    <label class="form-check-label" for="map1"> Bright </label>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="exampleRadiosMaps"
+                      id="map2"
+                      value="option222"
+                    />
+                    <label class="form-check-label" for="map2"> Smooth </label>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="exampleRadiosMaps"
+                      id="map3"
+                      value="option333"
+                    />
+                    <label class="form-check-label" for="map3">
+                      Transport
+                    </label>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="exampleRadiosMaps"
+                      id="map4"
+                      value="option444"
+                      checked
+                    />
+                    <label class="form-check-label" for="map4">
+                      Standard
+                    </label>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="exampleRadiosMaps"
+                      id="map5"
+                      value="option555"
+                    />
+                    <label class="form-check-label" for="map5">
+                      Satellite
+                    </label>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="btn-group-vehicle">
+            <button
+              class="btn btn-light dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              id="transportBtn"
+            >
+              Transport
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <a class="dropdown-item">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="exampleRadiosTwo"
+                      value="option1"
+                      onclick="setMode(this.id)"
+                      id="driving"
+                      checked
+                    />
+                    <label class="form-check-label" for="driving">
+                      Driving
+                    </label>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="exampleRadiosTwo"
+                      value="option2"
+                      onclick="setMode(this.id)"
+                      id="bike"
+                    />
+                    <label class="form-check-label" for="bike"> Bike </label>
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a class="dropdown-item">
+                  <div class="form-check">
+                    <input
+                      class="form-check-input"
+                      type="radio"
+                      name="exampleRadiosTwo"
+                      onclick="setMode(this.id)"
+                      id="foot"
+                      for="foot"
+                      value="option3"
+                    />
+                    <label class="form-check-label"> Foot </label>
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
+          <div class="btn-group-map d-flex">
+            <button
+              class="btn btn-light dropdown-toggle"
+              type="button"
+              data-bs-toggle="dropdown"
+              aria-expanded="false"
+              id="settingsBtn"
+            >
+              Settings
+            </button>
+            <ul class="dropdown-menu" id="mapItems">
+              <li>
+                <a id="3dBtn">
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      id="flexSwitchCheckDefault1"
+                      onclick="setThreeD()"
+                    />
+                    <label
+                      class="form-check-label"
+                      for="flexSwitchCheckDefault1"
+                      >3D Buildings</label
+                    >
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a id="hdBtn">
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      id="flexSwitchCheckDefault2"
+                    />
+                    <label
+                      class="form-check-label"
+                      for="flexSwitchCheckDefault2"
+                      onclick="changeRes()"
+                      >Retina View</label
+                    >
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a id="fontBtn">
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      id="flexSwitchCheckDefault3"
+                      onclick="changeFontSize()"
+                    />
+                    <label
+                      class="form-check-label"
+                      for="flexSwitchCheckDefault3"
+                      >Large Fonts</label
+                    >
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a id="rainBtn">
+                  <div class="form-check form-switch">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      id="flexSwitchCheckDefault4"
+                      onclick="showRain()"
+                    />
+                    <label
+                      class="form-check-label"
+                      for="flexSwitchCheckDefault4"
+                      >Rain Radar</label
+                    >
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a>
+                  <div class="form-check form-switch" id="userlocBtn">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      id="flexSwitchCheckDefault5"
+                      onclick="setCurrentUserLoc()"
+                    />
+                    <label
+                      class="form-check-label"
+                      for="flexSwitchCheckDefault5"
+                      >Locate Me</label
+                    >
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a>
+                  <div class="form-check form-switch" id="fullscreenBtn">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      id="flexSwitchCheckDefault6"
+                      onclick="showFullscreen()"
+                    />
+                    <label
+                      class="form-check-label"
+                      for="flexSwitchCheckDefault6"
+                      >Fullscreen</label
+                    >
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a>
+                  <div class="form-check form-switch" id="imperialBtn">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      id="flexSwitchCheckDefault7"
+                      onclick="setUnitSystem()"
+                    />
+                    <label
+                      class="form-check-label"
+                      for="flexSwitchCheckDefault7"
+                      >Imperial Units</label
+                    >
+                  </div>
+                </a>
+              </li>
+              <li>
+                <a>
+                  <div class="form-check form-switch" id="roundBtn">
+                    <input
+                      class="form-check-input"
+                      type="checkbox"
+                      role="switch"
+                      id="flexSwitchCheckDefault8"
+                      onclick="setRoundtrip()"
+                    />
+                    <label
+                      class="form-check-label"
+                      for="flexSwitchCheckDefault8"
+                      >Roundtrip</label
+                    >
+                  </div>
+                </a>
+              </li>
+            </ul>
+          </div>
+        </div>
+        <div class="input-group rounded p-2" id="actionArea">
+          <div
+            class="btn-group btn-group-lg"
+            role="group"
+            aria-label="menu"
+            id="actionBtns"
+          >
+            <button
+              class="btn btn-light d-flex d-row"
+              type="button"
+              id="lockBtn"
+              onclick="actDeactMarking()"
+            >
+              <div class="sidebarActionText">
+                <i class="bi bi-geo-alt-fill"></i>
+                <small>Add</small>
+              </div>
+              <h6>
+                <span class="badge text-bg-primary" id="badgeMarkerCount">
+                  0
+                </span>
+              </h6>
+            </button>
+            <button
+              type="button"
+              class="btn btn-light"
+              data-bs-toggle="modal"
+              data-bs-target="#upload"
+              id="importCaptcha"
+            >
+              <div class="sidebarActionText">
+                <i class="bi bi-cloud-upload-fill"></i>
+                <small>Import</small>
+              </div>
+            </button>
+            <button
+              type="button"
+              class="btn btn-light"
+              id="eraserBtn"
+              onclick="deleteAllMarkers()"
+            >
+              <div class="sidebarActionText">
+                <i class="bi bi-trash-fill"></i>
+                <small>Clear</small>
+              </div>
+            </button>
+            <button
+              type="button"
+              class="btn btn-light"
+              id="routeBtn"
+              data-bs-toggle="modal"
+              data-bs-target="#captchaFrame"
+            >
+              <div class="sidebarActionText">
+                <i class="bi bi-bounding-box"></i>
+                <small>Route</small>
+              </div>
+            </button>
+          </div>
+        </div>
+        <hr class="hr" />
+        <div class="input-group rounded p-2" id="filterArea">
+          <input
+            type="search"
+            class="form-control"
+            id="filterInput"
+            placeholder="Filter"
+            onkeyup="filterListitems()"
+          />
+          <button
+            type="button"
+            class="btn btn btn-light"
+            id="sortFilterBtn"
+            onclick="sortListIitems()"
+          >
+            <i class="bi bi-sort-alpha-down"></i>
+          </button>
+          <button
+            type="button"
+            class="btn btn btn-light"
+            id="deleteFilterBtn"
+            onclick="deleteFilterInput()"
+          >
+            <i class="bi bi-backspace-fill"></i>
+          </button>
+        </div>
+        <hr class="hr" />
+        <section class="listgroup" id="listgroup">
+          <div class="list-group p-2" id="listitems"></div>
+        </section>
+      </div>
+      <div id="container">
+        <div class="backgroundImage" id="backgroundLogoImage">
+          <img
+            src="./resources/svg/sidebar_graphics.svg"
+            alt="logo background ShortestRoute"
+            height="80"
+            width="80"
+          />
+        </div>
+        <footer class="d-flex d-col text-center text-lg-start">
+          <!-- Copyright -->
+          <div class="justify-content-end text-center p-3 small">
+            <hr class="hr" />
+            <a><b>© ShortestRoute 2023</b></a
+            ><br />
+            <a
+              id="ppAnchor"
+              data-bs-toggle="modal"
+              data-bs-target="#tosModal"
+              onclick="pasteTerms()"
+              >Terms</a
+            >
+            |
+            <a
+              id="tosAnchor"
+              data-bs-toggle="modal"
+              data-bs-target="#ppModal"
+              onclick="pastePriv()"
+              >Privacy</a
+            >
+            |
+            <a type="button" data-cc="c-settings">Cookies</a>
+          </div>
+        </footer>
+      </div>
+    </div>
+    <!-- Help -->
+    <div
+      class="modal fade"
+      id="exampleModal"
+      tabindex="-1"
+      aria-labelledby="helpModal"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="helpModal">
+              How do I add map markers?
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p class="d-block w-60 carou-padding">
+              Via address search and then clicking on the right-hand marker
+              symbol. Or via clicking on "Add" (marker symbol) before clicking
+              on a location on the map. Or via uploading a CSV file containing
+              all address data which will be added one-per-one. To start this
+              process, click on the "Import" button.
+            </p>
+            <br>
+            <video controls width="300" autoplay="false" style="display: flex; justify-content: center; align-items: center">
+              <source
+                src="/resources/webm/dropmarkers.webm"
+                type="video/webm"
+              />
+            </video>
+          </div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+              data-bs-target="#modalToggle2"
+              data-bs-toggle="modal"
+            >
+              Next
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal fade"
+      id="modalToggle2"
+      aria-hidden="true"
+      aria-labelledby="modalToggleLabel2"
+      tabindex="-1"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="modalToggleLabel2">
+              How do I calculate a route?
+            </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p class="d-block w-60 carou-padding">
+              You first need to add all location markers, then click on the
+              "Route" button (quadrangle symbol). The optimized route, waypoints
+              and directions will be displayed.
+            </p>
+            <br>
+              <video controls width="300" autoplay="false" style="display: flex; justify-content: center; align-items: center">
+              <source
+                src="/resources/webm/calcroute.webm"
+                type="video/webm"
+              />
+            </video>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-primary"
+              data-bs-toggle="modal"
+              data-bs-target="#exampleModal"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              data-bs-target="#modalToggle3"
+              data-bs-toggle="modal"
+            >
+              Next
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal fade"
+      id="modalToggle3"
+      aria-hidden="true"
+      aria-labelledby="modalToggleLabel3"
+      tabindex="-1"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="modalToggleLabel3">
+              What is the "Back" button for?
+            </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p class="d-block w-60 carou-padding">
+              For making changes in your route planning you have the option go
+              back one-step (i.e. to add or delete location markers).
+            </p>
+            <br>
+            <video controls width="300" autoplay="false" style="display: flex; justify-content: center; align-items: center">
+              <source src="/resources/webm/goback.webm" type="video/webm" />
+            </video>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+              data-bs-toggle="modal"
+              data-bs-target="#modalToggle2"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+              data-bs-target="#modalToggle4"
+              data-bs-toggle="modal"
+            >
+              Next
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div
+      class="modal fade"
+      id="modalToggle4"
+      aria-hidden="true"
+      aria-labelledby="modalToggleLabel4"
+      tabindex="-1"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="modalToggleLabel4">
+              How do I export my data?
+            </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p class="d-block w-60 carou-padding">
+              You can either download the route plan as a PDF incl. a map
+              screenshot via clicking on "Print" or export the route trace as a
+              GPX and CSV file by clicking on "Export".
+            </p>
+            <br>
+            <video controls width="300" autoplay="false" style="display: flex; justify-content: center; align-items: center">
+               <source src="/resources/webm/export.webm" type="video/webm" />
+            </video>
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+              data-bs-toggle="modal"
+              data-bs-target="#modalToggle3"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+              data-bs-target="#modalToggle5"
+              data-bs-toggle="modal"
+            >
+              Next
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="modal fade"
+      id="modalToggle5"
+      aria-hidden="true"
+      aria-labelledby="modalToggleLabel5"
+      tabindex="-1"
+    >
+      <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="modalToggleLabel5">
+              How can I navigate on my route?
+            </h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <p class="d-block w-60 carou-padding">
+              You can drive the calculated route by clicking the "Navigate"
+              button (road sign symbol) which will start Google Maps. If you
+              want to walk or cycle, you can also use the "Locate Me" map
+              pointer by opening "Settings".
+            </p>
+            <br>
+            <img
+             width="275"
+             class="disc-picture"
+             src="/resources/webm/navigate.png"
+             alt="shortestroute how to navigate on calculated route"
+             style="display: flex; justify-content: center; align-items: center"
+              />
+          </div>
+          <div class="modal-footer">
+            <button
+              class="btn btn-primary"
+              data-bs-dismiss="modal"
+              data-bs-toggle="modal"
+              data-bs-target="#modalToggle4"
+            >
+              Back
+            </button>
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bs-dismiss="modal"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mobile Sidebar -->
+        <!-- Mobile Sidebar -->
+    <div
+      class="btn-group-vertical btn-group-lg position-absolute top-50 start-0 translate-middle-y"
+      id="mobileSidebar"
+    >
+      <button
+        type="button"
+        class="btn btn btn-primary"
+        id="smallPinBtn"
+        onclick="actDeactMarking()"
+      >
+        <i class="bi bi-geo-alt-fill"></i>
+      </button>
+      <button
+        type="button"
+        class="btn btn btn-info"
+        id="smallRouteBtn"
+        onclick="getRoute()"
+      >
+        <i class="bi bi-bounding-box"></i>
+      </button>
+      <button
+        type="button"
+        class="btn btn btn-warning"
+        id="smallReturnBtn"
+        onclick="goBack()"
+        disabled
+      >
+        <i class="bi bi-arrow-clockwise"></i>
+      </button>
+      <button
+        type="button"
+        class="btn btn btn-danger"
+        id="smallNavBtn"
+        onclick="createMapsUrl()"
+        disabled
+      >
+        <i class="bi bi-sign-turn-right-fill"></i>
+      </button>
+      <button
+        type="button"
+        class="btn btn btn-success"
+        id="smallQuestionBtn"
+        data-bs-toggle="modal"
+        data-bs-target="#exampleModal"
+      >
+        <i class="bi bi-question-lg"></i>
+      </button>
+      <button type="button" class="btn btn btn-dark" id="nightBtn2">
+        <i class="bi bi-moon-stars-fill"></i>
+      </button>
+    </div>
+    <!-- Bootstrap -->
+    <script
+      src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"
+      integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz"
+      crossorigin="anonymous"
+    ></script>
+    <!-- CookieConsent-->
+    <script defer src="./scripts/ext.cookieconsent.js"></script>
+    <script defer src="./scripts/ext.cookieconsent-init.js"></script>
+    <!-- Custom JS -->
+    <script>
+     var _0x3ae238=_0x48e2;(function(_0xe14864,_0x104776){var _0x333f99=_0x48e2,_0x4ccb0f=_0xe14864();while(!![]){try{var _0x4f5e7a=-parseInt(_0x333f99(0x1f2))/0x1*(parseInt(_0x333f99(0x1b8))/0x2)+-parseInt(_0x333f99(0x1ba))/0x3+parseInt(_0x333f99(0xdb))/0x4+-parseInt(_0x333f99(0x13c))/0x5+parseInt(_0x333f99(0x1f3))/0x6+parseInt(_0x333f99(0x126))/0x7*(parseInt(_0x333f99(0x17a))/0x8)+parseInt(_0x333f99(0x100))/0x9;if(_0x4f5e7a===_0x104776)break;else _0x4ccb0f['push'](_0x4ccb0f['shift']());}catch(_0x56b43f){_0x4ccb0f['push'](_0x4ccb0f['shift']());}}}(_0x328a,0x58c0f));let searchDropdown=[],coordTouples=[],currentMarkers=[],markerCount=0x0,waypoints=[],waypointMarker=[],elevationProfile=[],elevationMap=[],userLoc=[],csvData=[],myGeoJSON={},myGpx=null,myCsvWp=[],summary=[],coordSwitch=0x0,MapModeCount=0x3,geolocSwitch=![],fontSizeSwitch=0x0,resSwitch=0x0,threeDSwitch=0x0,rainmapSwitch=0x0,transportMode=[_0x3ae238(0x143)],roundtripMode=!![],imperialUnits=![],transportLink='mapbox/driving';const mapboxKey=_0x3ae238(0x10e);var map=L[_0x3ae238(0x16e)](_0x3ae238(0x16e),{'renderer':L[_0x3ae238(0x1eb)](),'loadingControl':!![]})[_0x3ae238(0x1ca)]([0x14,-0x2d],0x3),assetLayerGroup=new L[(_0x3ae238(0x1bc))](),baseLayer=new L[(_0x3ae238(0x1d3))](_0x3ae238(0x1d6)+getDayNightMap(),{'maxZoom':0x13,'attribution':_0x3ae238(0x16f)});assetLayerGroup['addLayer'](baseLayer),assetLayerGroup[_0x3ae238(0x111)](map);const MapModi=[_0x3ae238(0x1a8),_0x3ae238(0x166),_0x3ae238(0x1d1),_0x3ae238(0x1b7),_0x3ae238(0x1ad),_0x3ae238(0xf7),_0x3ae238(0x11b),_0x3ae238(0x152)],attrib=[{'maxZoom':0x14,'attribution':_0x3ae238(0x16f)},{'maxZoom':0x14,'attribution':_0x3ae238(0x16f)},{'maxZoom':0x14,'attribution':_0x3ae238(0x16f)},{'maxZoom':0x11,'attribution':_0x3ae238(0xf9)},{'maxZoom':0x13,'attribution':_0x3ae238(0xeb)},{'attribution':'Tiles\x20&copy;\x20Esri\x20&mdash;\x20Source:\x20Esri,\x20i-cubed,\x20USDA,\x20USGS,\x20AEX,\x20GeoEye,\x20Getmapping,\x20Aerogrid,\x20IGN,\x20IGP,\x20UPR-EGP,\x20and\x20the\x20GIS\x20User\x20Community\x20'},{'attribution':'Map\x20tiles\x20by\x20<a\x20href=\x22http://stamen.com\x22>Stamen\x20Design</a>,\x20<a\x20href=\x22http://creativecommons.org/licenses/by/3.0\x22>CC\x20BY\x203.0</a>\x20&mdash;\x20Map\x20data\x20&copy;\x20<a\x20href=\x22https://www.openstreetmap.org/copyright\x22>OpenStreetMap</a>\x20','subdomains':_0x3ae238(0x14e),'minZoom':0x0,'maxZoom':0x14},{'attribution':_0x3ae238(0x1fb),'subdomains':_0x3ae238(0x14e),'minZoom':0x0,'maxZoom':0x14}];document[_0x3ae238(0x1a7)](_0x3ae238(0x118))['addEventListener'](_0x3ae238(0x20b),changeMapLayer),document['getElementById'](_0x3ae238(0x1bd))[_0x3ae238(0x115)](_0x3ae238(0x20b),changeMapLayer),document[_0x3ae238(0x1a7)](_0x3ae238(0x1a9))[_0x3ae238(0x115)](_0x3ae238(0x20b),changeMapLayer),document['getElementById'](_0x3ae238(0x1ab))['addEventListener']('click',changeMapLayer),document[_0x3ae238(0x1a7)](_0x3ae238(0x181))['addEventListener'](_0x3ae238(0x20b),changeMapLayer),document[_0x3ae238(0x1a7)](_0x3ae238(0x1ea))[_0x3ae238(0x115)](_0x3ae238(0x20b),changeMapLayer);function changeMapLayer(){var _0x3791f3=_0x3ae238;assetLayerGroup[_0x3791f3(0x1a6)]();let _0x14d200=this['id'][_0x3791f3(0x14a)](/^\D+/g,''),_0x1bcc27=L['tileLayer'](MapModi[_0x14d200],attrib[_0x14d200]);assetLayerGroup['addLayer'](_0x1bcc27);}let markerCounter=[],options={'icon':_0x3ae238(0x201),'iconShape':_0x3ae238(0x14d),'isAlphaNumericIcon':!![],'text':markerCounter,'iconSize':[0x1e,0x1e],'iconAnchor':[0xf,0xd],'borderColor':_0x3ae238(0x1ec),'backgroundColor':_0x3ae238(0x15c),'textColor':_0x3ae238(0x1ec),'spin':!![]},options1={'icon':'font-awesome','iconShape':_0x3ae238(0x14d),'isAlphaNumericIcon':!![],'text':'Go','iconSize':[0x1e,0x1e],'iconAnchor':[0xf,0xd],'borderColor':'white','backgroundColor':_0x3ae238(0x15c),'textColor':_0x3ae238(0x1ec),'spin':!![]},options2={'icon':_0x3ae238(0x201),'iconShape':'circle','borderColor':'rgba(255,\x20255,\x20255,\x200)','backgroundColor':_0x3ae238(0x1fe),'textColor':_0x3ae238(0x1fe),'spin':!![]},options3={'icon':_0x3ae238(0x1a3),'iconShape':_0x3ae238(0x176),'borderColor':_0x3ae238(0x180),'backgroundColor':_0x3ae238(0x180),'textColor':_0x3ae238(0x1fe)};var control=L['Routing'][_0x3ae238(0x1b0)]({'draggableWaypoints':![],'lineOptions':{'styles':[{'color':_0x3ae238(0x204),'opacity':0x1,'weight':0x5}],'addWaypoints':!![]},'routeWhileDragging':![],'router':L['Routing']['mapbox'](mapboxKey,options)})['addTo'](map),lc=L['control']['locate']()['addTo'](map);map['addControl'](L[_0x3ae238(0x1b0)][_0x3ae238(0x1dc)]({'locateOptions':{'enableHighAccuracy':!![]}}));var osmUrl=_0x3ae238(0x154),osm2=new L[(_0x3ae238(0x1b6))](osmUrl,{'minZoom':0x0,'maxZoom':0xd}),miniMap=new L[(_0x3ae238(0x12e))][(_0x3ae238(0xee))](osm2,{'toggleDisplay':!![]})['addTo'](map);let detailControl=new L['Control'][(_0x3ae238(0x157))](0x0,0x4);detailControl[_0x3ae238(0x111)](map),L[_0x3ae238(0x1b0)][_0x3ae238(0x1f1)]({'position':_0x3ae238(0x178),'nextButtonText':'>','playStopButtonText':_0x3ae238(0x14f),'prevButtonText':'<','positionSliderLabelText':_0x3ae238(0x1e4),'opacitySliderLabelText':'Opacity:','animationInterval':0x1f4,'opacity':0.5})[_0x3ae238(0x111)](map);function getDayNightMap(){var _0x555d98=_0x3ae238;if(window[_0x555d98(0x1af)])return window[_0x555d98(0x1af)](_0x555d98(0x162))['matches']?(document[_0x555d98(0x1a7)](_0x555d98(0x118))[_0x555d98(0xfe)]=!![],_0x555d98(0xe3)):'tile.openstreetmap.org/{z}/{x}/{y}.png';}L[_0x3ae238(0x165)]()[_0x3ae238(0x111)](map);let pluginOptions={'cropImageByInnerWH':!![],'hidden':![],'preventDownload':![],'domtoimageOptions':{},'position':_0x3ae238(0x1b1),'screenName':_0x3ae238(0x137),'hideElementsWithSelectors':[_0x3ae238(0x133)],'mimeType':_0x3ae238(0xe4),'caption':null,'captionFontSize':0xf,'captionFont':_0x3ae238(0xd8),'captionColor':_0x3ae238(0x206),'captionBgColor':'white','captionOffset':0x5,'onPixelDataFail':async function({node:_0x5e4db6,plugin:_0x5825da,error:_0x57fba6,mapPane:_0x51fc80,domtoimageOptions:_0x256344}){return _0x5825da['_getPixelDataOfNormalMap'](_0x256344);}};this[_0x3ae238(0x165)]=L['simpleMapScreenshoter'](pluginOptions)[_0x3ae238(0x111)](this[_0x3ae238(0x16e)]);function actDeactMarking(){var _0x476b03=_0x3ae238;if(coordSwitch===0x0)coordSwitch=0x1,document['getElementById']('lockBtn')[_0x476b03(0x197)]['add'](_0x476b03(0xe9)),document['getElementById'](_0x476b03(0xde))['classList'][_0x476b03(0xdd)](_0x476b03(0x141));else{if(coordSwitch===0x1)coordSwitch=0x0;else(coordSwitch!=0x1||coordSwitch!=0x0)&&(coordSwitch=0x0);}}function getGeoData(_0x4283ea){var _0x395159=_0x3ae238;_0x4283ea['preventDefault']();const _0x53d5=fetch(_0x395159(0x1d6)+_0x395159(0x113)+document[_0x395159(0x1a7)](_0x395159(0x148))[_0x395159(0x10c)]+'&limit=3&format=jsonv2');_0x53d5['then'](_0x2e6b54=>_0x2e6b54['json']())['then'](_0x3307cb=>{var _0x250f15=_0x395159;searchDropdown=[],coordTouples=[];for(i=0x0;i<_0x3307cb[_0x250f15(0x12d)];i++){searchDropdown['push'](_0x3307cb[i][_0x250f15(0x134)]),coordTouples['push']([_0x3307cb[i][_0x250f15(0x130)],_0x3307cb[i][_0x250f15(0x106)]]);}document[_0x250f15(0x1a7)](_0x250f15(0xf6))[_0x250f15(0x1da)]='';for(i=0x0;i<searchDropdown[_0x250f15(0x12d)];i++){document[_0x250f15(0x1a7)](_0x250f15(0xf6))[_0x250f15(0x1da)]+=_0x250f15(0x1e0)+_0x3307cb[i]['lat']+',\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20'+_0x3307cb[i][_0x250f15(0x106)]+');\x20clearSearchBar()\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20cursor:\x20pointer;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22mb-1\x22>'+searchDropdown[i]+'</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22tag\x20pt-3\x20pl-3\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20id=\x22'+[i]+'\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20onclick=\x22createCoordinate(id)\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22bi\x20bi-geo-alt-fill\x22\x20id=\x22locIcon\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20';}})['catch'](_0x622169=>{var _0x343f45=_0x395159;console[_0x343f45(0x1d2)](_0x343f45(0x1de),_0x622169);});}function reverseGeocode(_0x51004b,_0xa814ae){return new Promise(function(_0x14a01a,_0x11ce59){var _0x170cac=_0x48e2;axios[_0x170cac(0x15f)]('https://'+_0x170cac(0x132)+_0x51004b+_0x170cac(0xdf)+_0xa814ae+_0x170cac(0xe8))[_0x170cac(0xe5)](_0x490d6f=>{var _0x4a5de0=_0x170cac,_0x2558fa=_0x490d6f[_0x4a5de0(0x128)];typeof _0x2558fa['address']===_0x4a5de0(0x202)||typeof _0x2558fa[_0x4a5de0(0x1c8)][_0x4a5de0(0x17f)]===_0x4a5de0(0x202)?(alert(_0x4a5de0(0x173)),currentMarkers[currentMarkers['length']-0x1]['remove'](),currentMarkers[_0x4a5de0(0x1b2)]([currentMarkers['length']-0x1],0x1),coordSwitch=0x0):_0x14a01a(_0x2558fa[_0x4a5de0(0x134)]);},_0x32f81c=>{_0x11ce59(_0x32f81c);});});}async function createCoordinate(_0x75a309){var _0x4b4c70=_0x3ae238;const _0x416d36=[coordTouples[_0x75a309][0x0],coordTouples[_0x75a309][0x1]];var _0x550fb5=new L['marker'](_0x416d36,{'icon':L[_0x4b4c70(0x1c6)]['icon'](options)})[_0x4b4c70(0x111)](map);currentMarkers[_0x4b4c70(0x20d)](_0x550fb5),document['getElementById'](_0x4b4c70(0x20e))['click']();var _0x136ca1=await reverseGeocode(currentMarkers[currentMarkers[_0x4b4c70(0x12d)]-0x1][_0x4b4c70(0x163)][_0x4b4c70(0x130)],currentMarkers[currentMarkers[_0x4b4c70(0x12d)]-0x1][_0x4b4c70(0x163)][_0x4b4c70(0x179)]),_0x22c76c=getDistance(userLoc,[currentMarkers[currentMarkers[_0x4b4c70(0x12d)]-0x1][_0x4b4c70(0x163)][_0x4b4c70(0x130)],currentMarkers[currentMarkers[_0x4b4c70(0x12d)]-0x1][_0x4b4c70(0x163)][_0x4b4c70(0x179)]]),_0x5a993a;userLoc['length']===0x0?_0x5a993a='':_0x5a993a='▸\x20'+_0x22c76c+_0x4b4c70(0x147),document[_0x4b4c70(0x1a7)]('listitems')[_0x4b4c70(0x1da)]+='\x0a\x20\x20\x20\x20\x20\x20\x20\x20<a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22list-group-item\x20list-group-item-action\x20d-flex\x20flex-row\x20justify-content-between\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20id=\x22listitem'+(currentMarkers[_0x4b4c70(0x12d)]-0x1)+_0x4b4c70(0xfb)+currentMarkers[currentMarkers[_0x4b4c70(0x12d)]-0x1]['_leaflet_id']+_0x4b4c70(0xe6)+_0x136ca1+_0x4b4c70(0x1ee)+_0x5a993a+_0x4b4c70(0xd0),markerCount++,document[_0x4b4c70(0x1a7)](_0x4b4c70(0x12a))[_0x4b4c70(0x1da)]=''+markerCount,document[_0x4b4c70(0x1a7)]('container')[_0x4b4c70(0x1c2)][_0x4b4c70(0x175)]=_0x4b4c70(0x135),clearSearchBar();}map['on'](_0x3ae238(0x20b),async _0x51c0b8=>{var _0x11f5c1=_0x3ae238;if(coordSwitch===0x1){var _0x2cebcd=new L[(_0x11f5c1(0x14d))](_0x51c0b8[_0x11f5c1(0x19b)],{'icon':L['BeautifyIcon']['icon'](options)})[_0x11f5c1(0x111)](map);currentMarkers[_0x11f5c1(0x20d)](_0x2cebcd);var _0x3eaa06=await reverseGeocode(currentMarkers[currentMarkers[_0x11f5c1(0x12d)]-0x1]['_latlng']['lat'],currentMarkers[currentMarkers[_0x11f5c1(0x12d)]-0x1][_0x11f5c1(0x163)][_0x11f5c1(0x179)]),_0x1f5b19=getDistance(userLoc,[currentMarkers[currentMarkers[_0x11f5c1(0x12d)]-0x1][_0x11f5c1(0x163)]['lat'],currentMarkers[currentMarkers['length']-0x1][_0x11f5c1(0x163)][_0x11f5c1(0x179)]]),_0x2538a0;userLoc['length']===0x0?_0x2538a0='':_0x2538a0='▸\x20'+_0x1f5b19+_0x11f5c1(0x147),document['getElementById'](_0x11f5c1(0x13d))[_0x11f5c1(0x1da)]+=_0x11f5c1(0x18c)+(currentMarkers['length']-0x1)+_0x11f5c1(0x1ce)+currentMarkers[currentMarkers[_0x11f5c1(0x12d)]-0x1][_0x11f5c1(0x10a)]+_0x11f5c1(0x209)+_0x3eaa06+_0x11f5c1(0x129)+_0x2538a0+_0x11f5c1(0x18b),coordSwitch=0x0,markerCount++,document['getElementById'](_0x11f5c1(0x12a))[_0x11f5c1(0x1da)]=''+markerCount,document[_0x11f5c1(0x1a7)](_0x11f5c1(0x119))[_0x11f5c1(0x1c2)][_0x11f5c1(0x175)]='none',document[_0x11f5c1(0x1a7)]('lockBtn')[_0x11f5c1(0x197)][_0x11f5c1(0x15a)](_0x11f5c1(0x141)),document[_0x11f5c1(0x1a7)](_0x11f5c1(0xde))[_0x11f5c1(0x197)][_0x11f5c1(0xdd)](_0x11f5c1(0xe9));}else{if(coordSwitch===0x0)document['getElementById'](_0x11f5c1(0xf6))[_0x11f5c1(0x1da)]='';else return![];}});function removeListLoc(_0x2b07ea){var _0x527911=_0x3ae238,_0x36e35c=_0x2b07ea[_0x527911(0x14a)](/[^\d-]/g,'');document[_0x527911(0x1a7)](_0x2b07ea)[_0x527911(0xdd)](),currentMarkers[_0x36e35c][_0x527911(0xdd)](),currentMarkers[_0x527911(0x1b2)](_0x36e35c,0x1);for(var _0xc49172=document[_0x527911(0x1a7)](_0x527911(0x13d))[_0x527911(0x105)][_0x527911(0x12d)]-0x1;_0xc49172>=_0x36e35c;_0xc49172--){document[_0x527911(0x1a7)](_0x527911(0x13d))[_0x527911(0x105)][_0xc49172][_0x527911(0x1ae)]('id',_0xc49172);}markerCount--,document[_0x527911(0x1a7)](_0x527911(0x12a))['innerHTML']=''+markerCount,currentMarkers[_0x527911(0x12d)]===0x0?document[_0x527911(0x1a7)]('container')[_0x527911(0x1c2)]['display']=_0x527911(0x18e):document[_0x527911(0x1a7)]('container')[_0x527911(0x1c2)][_0x527911(0x175)]=_0x527911(0x135);}function deleteAllMarkers(){var _0x3d3038=_0x3ae238;if(window['confirm'](_0x3d3038(0x17e))){if(currentMarkers[_0x3d3038(0x12d)]===0x0)alert(_0x3d3038(0x110));else{if(currentMarkers[_0x3d3038(0x12d)]!=0x0&&waypoints[_0x3d3038(0x12d)]===0x0){for(i=currentMarkers[_0x3d3038(0x12d)]-0x1;i>=0x0;i--){currentMarkers[i][_0x3d3038(0xdd)]();}currentMarkers['splice'](0x0,currentMarkers[_0x3d3038(0x12d)]),document[_0x3d3038(0x1a7)](_0x3d3038(0x13d))[_0x3d3038(0x1da)]='';}else{if(currentMarkers[_0x3d3038(0x12d)]!=0x0&&waypoints[_0x3d3038(0x12d)]!=0x0){for(i=currentMarkers[_0x3d3038(0x12d)]-0x1;i>=0x0;i--){currentMarkers[i][_0x3d3038(0xdd)](),waypointMarker[i][_0x3d3038(0xdd)]();}currentMarkers['splice'](0x0,currentMarkers[_0x3d3038(0x12d)]),document['getElementById'](_0x3d3038(0x13d))[_0x3d3038(0x1da)]='',waypointMarker=[],waypoints=[];}else currentMarkers[i]===''&&(currentMarkers[_0x3d3038(0x1b2)](0x0,currentMarkers['length']),document[_0x3d3038(0x1a7)](_0x3d3038(0x13d))[_0x3d3038(0x1da)]='');}}markerCount=0x0,document[_0x3d3038(0x1a7)]('badgeMarkerCount')[_0x3d3038(0x1da)]=''+markerCount,currentMarkers[_0x3d3038(0x12d)]===0x0?document[_0x3d3038(0x1a7)](_0x3d3038(0x119))['style'][_0x3d3038(0x175)]=_0x3d3038(0x18e):document['getElementById']('container')['style'][_0x3d3038(0x175)]='none';}}function adjustActionArea(){var _0x3a596e=_0x3ae238;document[_0x3a596e(0x1a7)](_0x3a596e(0x19c))['innerHTML']='',document[_0x3a596e(0x1a7)]('actionArea')[_0x3a596e(0x1da)]+='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22btn-group\x20btn-group-lg\x22\x20role=\x22group\x22\x20aria-label=\x22Default\x20button\x20group\x22\x20id=\x22actionBtns2\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22btn\x20btn-light\x22\x20onclick=\x22goBack()\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22sidebarActionText\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22bi\x20bi-arrow-left-circle-fill\x20me-1\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<small>Back</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22btn\x20btn-light\x22\x20onclick=\x22createPdf()\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22sidebarActionText\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22bi\x20bi-printer-fill\x20me-1\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<small>Print</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22btn\x20btn-light\x22\x20onclick=\x22downloadRoute()\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22sidebarActionText\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22bi\x20bi-cloud-download-fill\x20me-1\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<small>Export</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22btn\x20btn-light\x22\x20onclick=\x22createMapsUrl()\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22sidebarActionText\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22bi\x20bi-sign-turn-right-fill\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<small>Navigate</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20';}function callApi(){var _0x3a2a17=_0x3ae238;setTransportRouter();let _0x15785d=[],_0x3365b5=0x1;for(i=0x0;i<currentMarkers[_0x3a2a17(0x12d)];i++){_0x15785d['push'](currentMarkers[i][_0x3a2a17(0x163)][_0x3a2a17(0x179)]),_0x15785d[_0x3a2a17(0x20d)](currentMarkers[i][_0x3a2a17(0x163)][_0x3a2a17(0x130)]);}let _0x8bc32=_0x15785d[_0x3a2a17(0x1cf)](_0xd1039d=>_0xd1039d)['toString'](),_0x2868af=_0x8bc32[_0x3a2a17(0x14a)](/,/g,_0x317609=>++_0x3365b5%0x2?';':_0x317609),_0x3fb62a;return roundtripMode===!![]?_0x3fb62a=_0x3a2a17(0x1aa):_0x3fb62a=_0x3a2a17(0x192),new Promise(function(_0x18d85b,_0xa015b6){var _0x5f280=_0x3a2a17;axios[_0x5f280(0x15f)](_0x5f280(0x1d6)+_0x5f280(0x1e8)+transportMode+'/'+_0x2868af+_0x5f280(0xcd)+roundtripMode+_0x5f280(0x193)+_0x3fb62a+'')[_0x5f280(0xe5)](_0x169875=>{var _0x12e85b=_0x5f280,_0x4c14b9=_0x169875[_0x12e85b(0x128)];_0x18d85b(_0x4c14b9['waypoints']),waypoints[_0x12e85b(0x20d)](_0x4c14b9['waypoints']),adjustActionArea();for(i=0x0;i<currentMarkers['length'];i++){markerCounter[_0x12e85b(0x20d)](waypoints[0x0][i][_0x12e85b(0x1b9)]),coord=[currentMarkers[i][_0x12e85b(0x163)][_0x12e85b(0x130)],currentMarkers[i]['_latlng'][_0x12e85b(0x179)]],i===0x0?waypointMarker[_0x12e85b(0x20d)](new L[(_0x12e85b(0x14d))](coord,{'icon':L[_0x12e85b(0x1c6)][_0x12e85b(0xe2)](options1)})['addTo'](map)):waypointMarker['push'](new L[(_0x12e85b(0x14d))](coord,{'icon':L[_0x12e85b(0x1c6)][_0x12e85b(0xe2)](options)})[_0x12e85b(0x111)](map)),markerCounter['shift']();}let _0x155fae=waypoints[0x0][_0x12e85b(0x171)](0x0);_0x155fae[_0x12e85b(0x15b)](function(_0x229ddb,_0x2bb71c){var _0x1ccc5e=_0x12e85b;return _0x229ddb['waypoint_index']-_0x2bb71c[_0x1ccc5e(0x1b9)];});let _0x322bca=[];for(i=0x0;i<_0x155fae[_0x12e85b(0x12d)];i++){_0x322bca[_0x12e85b(0x20d)](L[_0x12e85b(0x1c7)](_0x155fae[i][_0x12e85b(0x1e1)][0x1],_0x155fae[i][_0x12e85b(0x1e1)][0x0]));}control=L[_0x12e85b(0xff)][_0x12e85b(0x1b0)]({'waypoints':_0x322bca,'draggableWaypoints':![],'routeWhileDragging':![],'router':L[_0x12e85b(0xff)][_0x12e85b(0x11e)](mapboxKey,options),'showAlternatives':![],'lineOptions':{'styles':[{'color':_0x12e85b(0x17c),'opacity':0.8,'weight':0x7,'dashArray':_0x12e85b(0x114)}],'addWaypoints':![]},'createMarker':function(_0x1a3363,_0x1778df,_0x285503){var _0xb95418=_0x12e85b;if(_0x1a3363===0x0)return;if(_0x1a3363===_0x285503-0x1)return L['marker'](_0x1778df[_0xb95418(0x1c7)],{'icon':L[_0xb95418(0x1c6)]['icon'](options2)});}})['on'](_0x12e85b(0x200),async function(_0x31f313){var _0x1ef711=_0x12e85b;myGeoJSON={'type':_0x1ef711(0x1bf),'coordinates':[]};var _0x5e4842=[_0x31f313[_0x1ef711(0x12f)][0x0][_0x1ef711(0x170)]];for(i=0x0;i<_0x5e4842[0x0]['length'];i++){myGeoJSON[_0x1ef711(0x170)]['push']([_0x5e4842[0x0][i][_0x1ef711(0x179)],_0x5e4842[0x0][i][_0x1ef711(0x130)]]);}myGpx=togpx(myGeoJSON),summary[_0x1ef711(0x20d)](returnDistanceFormat(_0x31f313[_0x1ef711(0x12f)][0x0][_0x1ef711(0x18a)][_0x1ef711(0x186)])),summary[_0x1ef711(0x20d)](Math['round'](_0x31f313['routes'][0x0][_0x1ef711(0x18a)][_0x1ef711(0xdc)]/0x3c)),summary[_0x1ef711(0x20d)](transportMode),document[_0x1ef711(0x1a7)](_0x1ef711(0x14c))[_0x1ef711(0x1da)]='',document[_0x1ef711(0x1a7)]('filterArea')[_0x1ef711(0x1da)]+='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22accordion\x22\x20id=\x22accordionPanelsStayOpenExample\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22accordion-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h2\x20class=\x22accordion-header\x22\x20id=\x22panelsStayOpen-headingZeroZero\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22accordion-button\x22\x20type=\x22button\x22\x20data-bs-toggle=\x22collapse\x22\x20data-bs-target=\x22#panelsStayOpen-collapseZeroZero\x22\x20aria-expanded=\x22true\x22\x20aria-controls=\x22panelsStayOpen-collapseZeroZero\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<b>Summary</b>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22panelsStayOpen-collapseZeroZero\x22\x20class=\x22accordion-collapse\x20collapse\x20show\x22\x20aria-labelledby=\x22panelsStayOpen-headingZeroZero\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22accordion-body\x22\x20id=\x22accordionBodZero\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<b>Distance:</b>\x20'+returnDistanceFormat(_0x31f313[_0x1ef711(0x12f)][0x0][_0x1ef711(0x18a)][_0x1ef711(0x186)])+_0x1ef711(0x189)+Math[_0x1ef711(0xd6)](_0x31f313[_0x1ef711(0x12f)][0x0][_0x1ef711(0x18a)][_0x1ef711(0xdc)]/0x3c)+_0x1ef711(0xec)+transportMode+_0x1ef711(0x12b),document[_0x1ef711(0x1a7)]('listitems')[_0x1ef711(0x1da)]='',document[_0x1ef711(0x1a7)](_0x1ef711(0x13d))[_0x1ef711(0x1da)]=_0x1ef711(0x10f),waypoints[0x0]=waypoints[0x0][_0x1ef711(0x15b)]((_0x2bc36b,_0x2aa89d)=>_0x2bc36b['waypoint_index']-_0x2aa89d[_0x1ef711(0x1b9)]);for(i=0x0;i<waypoints[0x0]['length'];i++){var _0x4e9439=await reverseGeocode(waypoints[0x0][i][_0x1ef711(0x1e1)][0x1],waypoints[0x0][i][_0x1ef711(0x1e1)][0x0]);myCsvWp[_0x1ef711(0x20d)]([_0x4e9439]),document[_0x1ef711(0x1a7)](_0x1ef711(0x1e5))['innerHTML']+=_0x1ef711(0x16b)+_0x4e9439+_0x1ef711(0x1fc)+waypoints[0x0][i]['location'][0x1]+',\x20'+waypoints[0x0][i][_0x1ef711(0x1e1)][0x0]+')\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20';}elevationProfile=[],elevationMap=[];for(i=0x0;i<_0x31f313[_0x1ef711(0x12f)][0x0][_0x1ef711(0x170)]['length'];i+=Math[_0x1ef711(0xd6)](_0x31f313['routes'][0x0][_0x1ef711(0x170)][_0x1ef711(0x12d)]/0x64)){elevationProfile[_0x1ef711(0x12d)]<0x64&&(elevationProfile[_0x1ef711(0x20d)]('latitude='+_0x31f313[_0x1ef711(0x12f)][0x0][_0x1ef711(0x170)][i][_0x1ef711(0x130)]),elevationProfile[_0x1ef711(0x20d)](_0x1ef711(0x107)+_0x31f313[_0x1ef711(0x12f)][0x0]['coordinates'][i][_0x1ef711(0x179)]));}await callElevData(),drawChart(),document[_0x1ef711(0x1a7)](_0x1ef711(0x13d))[_0x1ef711(0x1da)]+=_0x1ef711(0x1ac);for(i=0x0;i<_0x31f313[_0x1ef711(0x12f)][0x0][_0x1ef711(0x17b)]['length'];i++){document[_0x1ef711(0x1a7)](_0x1ef711(0x158))[_0x1ef711(0x1da)]+=_0x1ef711(0x1a1)+_0x31f313[_0x1ef711(0x12f)][0x0]['coordinates'][_0x31f313[_0x1ef711(0x12f)][0x0][_0x1ef711(0x17b)][i][_0x1ef711(0x1cb)]][_0x1ef711(0x130)]+',\x20'+_0x31f313[_0x1ef711(0x12f)][0x0][_0x1ef711(0x170)][_0x31f313[_0x1ef711(0x12f)][0x0][_0x1ef711(0x17b)][i][_0x1ef711(0x1cb)]][_0x1ef711(0x179)]+')\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20><div><b>'+[i+0x1]+_0x1ef711(0x182)+_0x31f313[_0x1ef711(0x12f)][0x0][_0x1ef711(0x17b)][i][_0x1ef711(0x13e)]+_0x1ef711(0x144)+returnDistanceFormat(_0x31f313[_0x1ef711(0x12f)][0x0][_0x1ef711(0x17b)][i][_0x1ef711(0x127)])+_0x1ef711(0x1f7);}})[_0x12e85b(0x111)](map);},_0x1d684d=>{_0xa015b6(_0x1d684d);});});}const signupCaptcha=document[_0x3ae238(0x1a7)](_0x3ae238(0xf3));function _0x328a(){var _0x11d6c6=['circle','innerText','bottomleft','lng','696rIlVGP','instructions','#0066ff','monotone','Do\x20you\x20really\x20want\x20to\x20delete\x20all\x20markers?','road','#3355FF','map4','</b></div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>','appendChild','flexSwitchCheckDefault8','sidebar-wrapper','totalDistance','setContent','Copied','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<br>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<b>Duration:</b>\x20','summary','</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</section>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22d-flex\x20flex-column\x20justify-content-between\x22\x20style=\x22flex:\x201\x201\x202;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22bi\x20bi-x-square-fill\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20onclick=\x22removeListLoc(parentNode.parentNode.id)\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</a>','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22list-group-item\x20list-group-item-action\x20d-flex\x20flex-row\x20justify-content-between\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20id=\x22listitem','Distance:\x20','flex','Routing\x20Summary','navbar-toggler-icon','json','last','&source=first&destination=','change','reduce','data-bs-theme','classList','_waypoints.csv','startRainmap','clipboard','latlng','actionArea','&limit=1&format=jsonv2','log','getElementsByClassName','stop','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22list-group-item\x20list-group-item-action\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22display:\x20grid;\x20grid-template-columns:\x201fr\x208fr\x201fr;\x20gap:\x2010px;\x20border:\x20none;\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20onclick=\x22flyToMarker(','string','leaf','parentElement','moonIcon','clearLayers','getElementById','https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png','map2','any','map3','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<hr\x20class=\x22hr\x22\x20/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22accordion\x22\x20id=\x22accordionPanelsStayOpenExample\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22accordion-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h2\x20class=\x22accordion-header\x22\x20id=\x22panelsStayOpen-headingTwo\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22accordion-button\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20type=\x22button\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-bs-toggle=\x22collapse\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-bs-target=\x22#panelsStayOpen-collapseTwo\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20aria-expanded=\x22false\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20aria-controls=\x22panelsStayOpen-collapseTwo\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<b>Directions</b>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22panelsStayOpen-collapseTwo\x22\x20class=\x22accordion-collapse\x22\x20aria-labelledby=\x22panelsStayOpen-headingTwo\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22accordion-body\x20p-1\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','https://tile.openstreetmap.org/{z}/{x}/{y}.png','setAttribute','matchMedia','control','topleft','splice','#infoBtn','searchBtn','Cannot\x20find\x20exact\x20address.','TileLayer','https://tile.opentopomap.org/{z}/{x}/{y}.png','1161862UwLSQm','waypoint_index','1183101fBzzev','querySelector','LayerGroup','map1','Could\x20not\x20parse\x20the\x20file.','LineString','load','timeZone','style','list-group-item-action','elevation','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22list-group-item\x20list-group-item-action\x20d-flex\x20flex-row\x20justify-content-between\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20id=\x22listitem','BeautifyIcon','latLng','address','DateTimeFormat','setView','index','csvInput','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<input\x20type=\x22search\x22\x20class=\x22form-control\x22\x20id=\x22filterInput\x22\x20placeholder=\x22Filter..\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20onkeyup=\x22filterListitems()\x22\x20/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22btn\x20btn\x20btn-light\x22\x20id=\x22sortFilterBtn\x22\x20onclick=\x22sortListIitems()\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22bi\x20bi-sort-alpha-down\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22btn\x20btn\x20btn-light\x22\x20id=\x22deleteFilterBtn\x22\x20onclick=\x22deleteFilterInput()\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22bi\x20bi-backspace-fill\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<section\x20class=\x22d-flex\x20flex-column\x22\x20style=\x22flex:\x2011\x201\x200;\x22\x20id=\x22','flatMap','Route\x20(%)','https://tiles.stadiamaps.com/tiles/alidade_smooth/{z}/{x}/{y}{r}.png','error','tileLayer','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</span></h6>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22btn\x20btn-light\x22\x20data-bs-toggle=\x22modal\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20data-bs-target=\x22#upload\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22sidebarActionText\x22><i\x20class=\x22bi\x20bi-cloud-upload-fill\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<small>Import</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22btn\x20btn-light\x22\x20id=\x22eraserBtn\x22\x20onclick=\x22deleteAllMarkers()\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22sidebarActionText\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22bi\x20bi-trash-fill\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<small>Clear</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22btn\x20btn-light\x22\x20id=\x22routeBtn\x22\x20onclick=\x22getRoute()\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22sidebarActionText\x22><i\x20class=\x22bi\x20bi-bounding-box\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<small>Route</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20','_blank','https://','mapLayerBtn','indexOf','mapbox/walking','innerHTML','line','locate','sqrt','Error:','light','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22d-flex\x20flex-row\x20justify-content-between\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22d-flex\x20flex-column\x20p-3\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20onclick=\x22flyToMarker(','location','./resources/data/countries.json','Toast','Hour:','panelsStayOpen-collapseOne','flexSwitchCheckDefault5','DOMContentLoaded','router.project-osrm.org/trip/v1/','active-nav','map5','canvas','white','smallRouteBtn','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<small\x20class=\x22mb-1\x20px-1\x22>','toastField','addPage','rainviewer','1tSbFFh','1918404CHSaUM',')\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</a>','smallNavBtn','sin','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>','questionBtn','foot','removeControl','Map\x20tiles\x20by\x20<a\x20href=\x22http://stamen.com\x22>Stamen\x20Design</a>,\x20<a\x20href=\x22http://creativecommons.org/licenses/by/3.0\x22>CC\x20BY\x203.0</a>\x20&mdash;\x20Map\x20data\x20&copy;\x20<a\x20href=\x22https://www.openstreetmap.org/copyright\x22>OpenStreetMap</a>\x20','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20style=\x22padding:\x200\x201rem\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22bi\x20bi-zoom-in\x22\x20onclick=\x22flyToMarker(','screenshotBtn','rgba(255,\x20255,\x20255,\x200)','Duration:\x20','routesfound','font-awesome','undefined','</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</section>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22d-flex\x20flex-column\x20justify-content-between\x22\x20style=\x22flex:\x201\x201\x202;\x22\x20id=\x22','blue','cos','black','data:attachment/csv,','toISOString','\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22mb-1\x20px-1\x22>','flexSwitchCheckDefault6','click','nightBtn','push','deleteBtn','?roundtrip=','setFont','mapbox/cycling','</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</section>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22d-flex\x20flex-column\x20justify-content-between\x22\x20style=\x22flex:\x201\x201\x202;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22bi\x20bi-x-square-fill\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20onclick=\x22removeListLoc(parentNode.parentNode.id)\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</a>','find','getElementsByTagName','nav-rotated','liveToast','min','round','nightBtn2','Arial','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22liveToast\x22\x20class=\x22toast\x22\x20role=\x22alert\x22\x20aria-live=\x22assertive\x22\x20aria-atomic=\x22true\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22toast-header\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong\x20class=\x22me-auto\x22>Route\x20&\x20directions\x20are\x20loading\x20\x20🕒</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22btn-close\x22\x20data-bs-dismiss=\x22toast\x22\x20aria-label=\x22Close\x22></button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20','token','1113052rKsRZe','totalTime','remove','lockBtn','&lon=','Height\x20(m)','d-flex','icon','tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png','image/png','then','\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22mb-1\x20px-1\x22>','bi-moon-stars-fill','&format=jsonv2','btn-dark','Mode:\x20','&copy;\x20<a\x20href=\x22https://www.openstreetmap.org/copyright\x22>OpenStreetMap</a>\x20','min\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<br>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22summaryTitle\x20d-flex\x20d-row\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<b\x20class=\x22me-1\x22>Transport:</b>','documentElement','MiniMap','toggle','resolvedOptions','d-none','hideRainmap','captchaStuff','toString','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22btn-group\x20btn-group-lg\x22\x20role=\x22group\x22\x20aria-label=\x22Default\x20button\x20group\x22\x20id=\x22actionBtns\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22btn\x20btn-light\x20d-flex\x20d-row\x22\x20type=\x22button\x22\x20id=\x22lockBtn\x22\x20onclick=\x22actDeactMarking()\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22sidebarActionText\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22bi\x20bi-geo-alt-fill\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<small>Drop</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h6><span\x20class=\x22badge\x20text-bg-primary\x22\x20id=\x22badgeMarkerCount\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','card','https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}','writeText','Map\x20data:\x20&copy;\x20<a\x20href=\x22https://www.openstreetmap.org/copyright\x22>OpenStreetMap</a>\x20,\x20<a\x20href=\x22http://viewfinderpanoramas.org\x22>SRTM</a>\x20|\x20Map\x20style:\x20&copy;\x20<a\x20href=\x22https://opentopomap.org\x22>OpenTopoMap</a>\x20(<a\x20href=\x22https://creativecommons.org/licenses/by-sa/3.0/\x22>CC-BY-SA</a>)\x20','infoBtn','\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<section\x20class=\x22d-flex\x20flex-column\x22\x20style=\x22flex:\x2011\x201\x200;\x22\x20id=\x22','splitTextToSize','www.','checked','Routing','5605227CGDLEs','matches','There\x20are\x20no\x20markers\x20placed\x20on\x20the\x20map!','localeCompare','bi-brightness-high','children','lon','longitude=','ShortestRoute.net','join','_leaflet_id','bg-light','value','pow','pk.eyJ1IjoicGFzcGFzcGFzMTIzNDEyMzQiLCJhIjoiY2xqZGpocThyMDU1ZDNsbGxuM2Vsc3pqMyJ9.SpLF-rZfUnZxqoq3ZqpVfg','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22accordion\x22\x20id=\x22accordionPanelsStayOpenExample\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22accordion-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h2\x20class=\x22accordion-header\x22\x20id=\x22panelsStayOpen-headingOne\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22accordion-button\x22\x20type=\x22button\x22\x20data-bs-toggle=\x22collapse\x22\x20data-bs-target=\x22#panelsStayOpen-collapseOne\x22\x20aria-expanded=\x22true\x22\x20aria-controls=\x22panelsStayOpen-collapseOne\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<b>Waypoints</b>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22panelsStayOpen-collapseOne\x22\x20class=\x22accordion-collapse\x20collapse\x20show\x22\x20aria-labelledby=\x22panelsStayOpen-headingOne\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22accordion-body\x20p-1\x22\x20id=\x22accordionBodOne\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','No\x20markers\x20placed\x20on\x20the\x20map!','addTo','\x0a\x20\x20\x20\x20\x20\x20\x20\x20<a\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22list-group-item\x20list-group-item-action\x20d-flex\x20flex-row\x20justify-content-between\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20id=\x22listitem','nominatim.openstreetmap.org/search.php?q=','7,12','addEventListener','getAttribute','smallReturnBtn','map0','container','End:\x20','https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}{r}.png','dark','show','mapbox','Directions:','closeModal','Start:\x20','navbar','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<small\x20class=\x22mb-1\x20px-1\x22>','c_darkmode','smallPinBtn','50239ildkpj','distance','data','</p>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<small\x20class=\x22mb-1\x20px-1\x22>','badgeMarkerCount','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<hr\x20class=\x22hr\x22\x20/>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22accordion\x22\x20id=\x22accordionPanelsStayOpenExample\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22accordion-item\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<h2\x20class=\x22accordion-header\x22\x20id=\x22panelsStayOpen-headingZeroOne\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20class=\x22accordion-button\x22\x20type=\x22button\x22\x20data-bs-toggle=\x22collapse\x22\x20data-bs-target=\x22#panelsStayOpen-collapseZero\x22\x20aria-expanded=\x22true\x22\x20aria-controls=\x22panelsStayOpen-collapseZero\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<b>Elevation</b>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</h2>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22panelsStayOpen-collapseZero\x22\x20class=\x22accordion-collapse\x20collapse\x20show\x22\x20aria-labelledby=\x22panelsStayOpen-headingZero\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22accordion-body\x22\x20id=\x22accordionBodZeroOne\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<canvas\x20id=\x22myChart\x22></canvas>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','createElement','length','Control','routes','lat','bold','nominatim.openstreetmap.org/reverse.php?lat=','.leaflet-control-container','display_name','none','bike','screen','transportBtn','disabled','section','backgroundColor','2531830gClMGt','listitems','text','bg-dark','\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22bi\x20bi-x-square-fill\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20onclick=\x22removeListLoc(parentNode.parentNode.id)\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22bi\x20bi-zoom-in\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20onclick=\x22flyToMarker(','btn-light','verified\x20event','driving','</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div>','lightgray','parse','\x20kilometers\x20direct\x20distance\x20away\x20from\x20you.','searchBar','mapbox/driving','replace',']\x20\x20','filterArea','marker','abcd','Play/Stop','{s}.data.osmbuildings.org/0.2/anonymous/tile/{z}/{x}/{y}.json','closeCaptchaModal','https://stamen-tiles-{s}.a.ssl.fastly.net/toner/{z}/{x}/{y}{r}.png','files','http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png','flexSwitchCheckDefault7','max','DetailLevel','panelsStayOpen-collapseTwo','setProperties','add','sort','#0066cc','toUpperCase','settingsBtn','get','body','concat','(prefers-color-scheme:\x20dark)','_latlng','myChart','simpleMapScreenshoter','https://tiles.stadiamaps.com/tiles/osm_bright/{z}/{x}/{y}{r}.png','normal','getInstance','href','#sidebar-wrapper','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20class=\x22list-group-item\x20list-group-item-action\x20d-flex\x20flex-row\x20justify-content-between\x20p-2\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20style=\x22flex:\x202;\x20border:\x20none\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22d-flex\x20ms-2\x22>','open','toggleFullscreen','map','&copy;\x20<a\x20href=\x22https://stadiamaps.com/\x22>Stadia\x20Maps</a>\x20&copy;\x20<a\x20href=\x22https://openmaptiles.org/\x22>OpenMapTiles</a>\x20&copy;\x20<a\x20href=\x22http://openstreetmap.org\x22>OpenStreetMap</a>\x20','coordinates','slice','summary,\x20route,\x20navigation,\x20waypoints,\x20pdf','Exact\x20street\x20cannot\x20be\x20accessed!','Tooltip','display'];_0x328a=function(){return _0x11d6c6;};return _0x328a();}signupCaptcha['addEventListener']('verified',_0x5e386e=>{var _0x47260=_0x3ae238;console['log'](_0x47260(0x142),{'token':_0x5e386e[_0x47260(0xda)]}),getRoute(),document[_0x47260(0x1a7)](_0x47260(0x151))[_0x47260(0x20b)]();}),signupCaptcha[_0x3ae238(0x115)](_0x3ae238(0x1d2),_0x250168=>{var _0x4c50ae=_0x3ae238;console[_0x4c50ae(0x19e)]('error\x20event',{'error':_0x250168[_0x4c50ae(0x1d2)]}),console['log']('Captcha\x20image\x20test\x20has\x20failed!');});function getRoute(){var _0x5d0974=_0x3ae238;currentMarkers[_0x5d0974(0x12d)]===0x0?alert(_0x5d0974(0x102)):(document['getElementById']('searchBar')[_0x5d0974(0x1c2)][_0x5d0974(0x13b)]=_0x5d0974(0x145),document[_0x5d0974(0x1a7)]('searchBar')[_0x5d0974(0x139)]=!![],document[_0x5d0974(0x1a7)](_0x5d0974(0x20e))['disabled']=!![],document[_0x5d0974(0x1a7)](_0x5d0974(0x1b4))[_0x5d0974(0x139)]=!![],document[_0x5d0974(0x1a7)](_0x5d0974(0x125))[_0x5d0974(0x139)]=!![],document['getElementById'](_0x5d0974(0x1ed))[_0x5d0974(0x139)]=!![],document['getElementById'](_0x5d0974(0x117))[_0x5d0974(0x139)]=![],document[_0x5d0974(0x1a7)](_0x5d0974(0x1f5))[_0x5d0974(0x139)]=![],callApi(),document[_0x5d0974(0x1a7)](_0x5d0974(0x1ef))[_0x5d0974(0x1da)]='',document[_0x5d0974(0x1a7)](_0x5d0974(0x1ef))['innerHTML']+=_0x5d0974(0xd9),new bootstrap[(_0x5d0974(0x1e3))](document[_0x5d0974(0x1a7)](_0x5d0974(0xd4)))['show']());}async function goBack(){var _0xb9b745=_0x3ae238;document[_0xb9b745(0x1a7)](_0xb9b745(0x1ef))[_0xb9b745(0x1da)]='',document['getElementById'](_0xb9b745(0x1ef))[_0xb9b745(0x1da)]+='\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20id=\x22liveToast\x22\x20class=\x22toast\x22\x20role=\x22alert\x22\x20aria-live=\x22assertive\x22\x20aria-atomic=\x22true\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<div\x20class=\x22toast-header\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong\x20class=\x22me-auto\x22>Markers\x20are\x20loading\x20\x20🕒</strong>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<button\x20type=\x22button\x22\x20class=\x22btn-close\x22\x20data-bs-dismiss=\x22toast\x22\x20aria-label=\x22Close\x22></button>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</div>\x0a\x20\x20\x20\x20\x20\x20',new bootstrap[(_0xb9b745(0x1e3))](document[_0xb9b745(0x1a7)](_0xb9b745(0xd4)))[_0xb9b745(0x11d)](),document[_0xb9b745(0x1a7)](_0xb9b745(0x148))[_0xb9b745(0x1c2)]['backgroundColor']=null,document['getElementById']('searchBar')[_0xb9b745(0x139)]=![],document[_0xb9b745(0x1a7)](_0xb9b745(0x20e))['disabled']=![],document[_0xb9b745(0x1a7)](_0xb9b745(0x1b4))[_0xb9b745(0x139)]=![],document['getElementById'](_0xb9b745(0x125))['disabled']=![],document[_0xb9b745(0x1a7)]('smallRouteBtn')[_0xb9b745(0x139)]=![],document[_0xb9b745(0x1a7)](_0xb9b745(0x117))['disabled']=!![],document[_0xb9b745(0x1a7)]('smallNavBtn')['disabled']=!![],waypoints=[],myGeoJSON={},myGpx=null,myCsvWp=[],summary=[],document[_0xb9b745(0x1a7)]('actionArea')['innerHTML']='',document[_0xb9b745(0x1a7)]('actionArea')[_0xb9b745(0x1da)]+=_0xb9b745(0xf5)+markerCount+_0xb9b745(0x1d4),document[_0xb9b745(0x1a7)](_0xb9b745(0x14c))[_0xb9b745(0x1da)]='',document[_0xb9b745(0x1a7)](_0xb9b745(0x14c))['innerHTML']+=_0xb9b745(0x1cd),document['getElementById'](_0xb9b745(0x13d))[_0xb9b745(0x1da)]='';for(i=0x0;i<currentMarkers[_0xb9b745(0x12d)];i++){var _0x337fd8=await reverseGeocode(currentMarkers[i][_0xb9b745(0x163)][_0xb9b745(0x130)],currentMarkers[i][_0xb9b745(0x163)][_0xb9b745(0x179)]),_0x34d997=getDistance(userLoc,[currentMarkers[i][_0xb9b745(0x163)]['lat'],currentMarkers[i][_0xb9b745(0x163)][_0xb9b745(0x179)]]),_0x2d1c80;userLoc[_0xb9b745(0x12d)]===0x0?_0x2d1c80='':_0x2d1c80='▸\x20'+_0x34d997+'\x20kilometers\x20direct\x20distance\x20away\x20from\x20you.',document[_0xb9b745(0x1a7)](_0xb9b745(0x13d))['innerHTML']+=_0xb9b745(0x112)+[i]+_0xb9b745(0xfb)+currentMarkers[i][_0xb9b745(0x10a)]+'\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22mb-1\x20px-1\x22>'+_0x337fd8+_0xb9b745(0x1ee)+_0x2d1c80+'</small>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</section>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<span\x20class=\x22d-flex\x20flex-column\x20justify-content-between\x22\x20style=\x22flex:\x201\x201\x202;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<i\x20class=\x22bi\x20bi-x-square-fill\x22\x20onclick=\x22removeListLoc(parentNode.parentNode.id)\x22></i>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20</span>\x0a\x20\x20\x20\x20\x20\x20\x20\x20</a>';}map[_0xb9b745(0x1fa)](control),waypointMarker['forEach'](_0x25b9d1=>_0x25b9d1[_0xb9b745(0xdd)]());}function callElevData(){var _0x1b11f0=elevationProfile['join']('&');return new Promise(function(_0x1152e8,_0x1ab68c){var _0x3f1f6f=_0x48e2;axios[_0x3f1f6f(0x15f)]('https://api.open-meteo.com/v1/elevation?'+_0x1b11f0)['then'](_0x3be490=>{var _0x557c1a=_0x3f1f6f,_0x469370=_0x3be490['data'];_0x1152e8(_0x469370[_0x557c1a(0x1c4)]),elevationMap['push'](_0x469370['elevation']);},_0x15f731=>{_0x1ab68c(_0x15f731);});});}function drawChart(){var _0x3ca979=_0x3ae238;const _0x10db58=document[_0x3ca979(0x1a7)](_0x3ca979(0x164)),_0x6834dc=[],_0xc623af=elevationMap[0x0],_0x2762c9=_0xc623af[_0x3ca979(0x12d)];for(let _0x2651d0=0x0;_0x2651d0<_0x2762c9;++_0x2651d0){_0x6834dc['push'](((_0x2651d0+0x1)*0x2)[_0x3ca979(0xf4)]());}const _0x41eca0={'labels':_0x6834dc,'datasets':[{'label':_0x3ca979(0xe0),'data':_0xc623af,'borderColor':window[_0x3ca979(0x1af)](_0x3ca979(0x162))[_0x3ca979(0x101)]?'#d3d3d3':_0x3ca979(0x17c),'fill':!![],'cubicInterpolationMode':_0x3ca979(0x17d),'tension':0.4,'pointRadius':0x1}]};new Chart(_0x10db58,{'type':_0x3ca979(0x1db),'data':_0x41eca0,'layout':{'padding':{'top':0x14}},'options':{'responsive':!![],'plugins':{'legend':{'display':![]},'tooltip':{'enabled':![]}},'interaction':{'intersect':![]},'legend':{'display':![]},'scales':{'x':{'beginAtZero':!![],'display':!![],'title':{'display':!![],'text':_0x3ca979(0x1d0)}},'y':{'beginAtZero':!![],'display':!![],'title':{'display':!![],'text':_0x3ca979(0xe0)},'suggestedMin':Math[_0x3ca979(0xd5)](_0xc623af),'suggestedMax':Math[_0x3ca979(0x156)](_0xc623af)}}}});}function setTransportRouter(){var _0x25e776=_0x3ae238;transportLink='';switch(transportMode[0x0]){case _0x25e776(0x143):transportLink='mapbox/driving';break;case _0x25e776(0x136):transportLink=_0x25e776(0xcf);break;case _0x25e776(0x1f9):transportLink=_0x25e776(0x1d9);break;default:transportLink=_0x25e776(0x149);break;}}function setCurrentUserLoc(){var _0xa0c7c4=_0x3ae238;document[_0xa0c7c4(0x1a7)]('flexSwitchCheckDefault5')[_0xa0c7c4(0xfe)]===![]?lc[_0xa0c7c4(0x1a0)]():lc['start']();}function getDistance(_0x4b483b,_0x5b71c6){var _0x4af6bc=_0x3ae238;function _0x47f89c(_0x526f49){return _0x526f49*Math['PI']/0xb4;}var _0x4cb678=_0x47f89c(_0x4b483b[0x1]),_0x35fd3a=_0x47f89c(_0x4b483b[0x0]),_0x2c776e=_0x47f89c(_0x5b71c6[0x1]),_0x5dcbc9=_0x47f89c(_0x5b71c6[0x0]),_0x5b1ab6=_0x5dcbc9-_0x35fd3a,_0xfea912=_0x2c776e-_0x4cb678,_0xf23c91=Math['pow'](Math[_0x4af6bc(0x1f6)](_0x5b1ab6/0x2),0x2)+Math[_0x4af6bc(0x205)](_0x35fd3a)*Math[_0x4af6bc(0x205)](_0x5dcbc9)*Math[_0x4af6bc(0x10d)](Math['sin'](_0xfea912/0x2),0x2),_0x32fc2e=0x2*Math['asin'](Math[_0x4af6bc(0x1dd)](_0xf23c91)),_0x41fade=0x18e3;return Math['round'](_0x32fc2e*_0x41fade);}function flyToMarker(_0x5af3a3,_0x138a72){map['flyTo']([_0x5af3a3,_0x138a72],0x10,{'pan':{'animate':![],'duration':1.5},'zoom':{'animate':![]}});}function changeFontSize(){var _0x150ea3=_0x3ae238;switch(fontSizeSwitch){case 0x0:startLayer=L[_0x150ea3(0x1d3)](_0x150ea3(0x1d6)+getDayNightMap(),{'maxZoom':0x13,'tileSize':0x200,'zoomOffset':-0x1})[_0x150ea3(0x111)](map),fontSizeSwitch=0x1;break;case 0x1:startLayer=L[_0x150ea3(0x1d3)](_0x150ea3(0x1d6)+getDayNightMap(),{'maxZoom':0x13})[_0x150ea3(0x111)](map),fontSizeSwitch=0x0;break;default:startLayer=L[_0x150ea3(0x1d3)](_0x150ea3(0x1d6)+getDayNightMap(),{'maxZoom':0x13})[_0x150ea3(0x111)](map),fontSizeSwitch=0x1;break;}return;}function changeRes(){var _0x178fbf=_0x3ae238;if(resSwitch===0x0)document[_0x178fbf(0x1a7)]('increaseRes')[_0x178fbf(0x20b)](),resSwitch=0x1;else resSwitch===0x1&&(document[_0x178fbf(0x1a7)]('decreaseRes')[_0x178fbf(0x20b)](),resSwitch=0x0);}function setThreeD(){var _0xee3c08=_0x3ae238;if(threeDSwitch===0x0){var _0x3e6707=new OSMBuildings(map)[_0xee3c08(0x1c0)]('https://'+_0xee3c08(0x150));threeDSwitch=0x1,map['setZoom'](0x12);}else{if(threeDSwitch===0x1){var _0x3e6707=new OSMBuildings(map)[_0xee3c08(0xdd)]();threeDSwitch=0x0;}}}function setMode(_0x1f74bc){var _0x595be7=_0x3ae238;transportMode=[],transportMode[_0x595be7(0x20d)](_0x1f74bc),setTransportRouter();}function showRain(){var _0x5deb7c=_0x3ae238;if(rainmapSwitch===0x0)document['getElementById'](_0x5deb7c(0x199))[_0x5deb7c(0x20b)](),rainmapSwitch=0x1;else rainmapSwitch===0x1&&(document[_0x5deb7c(0x1a7)](_0x5deb7c(0xf2))[_0x5deb7c(0x20b)](),rainmapSwitch=0x0);}function showFullscreen(){var _0x41d3ef=_0x3ae238;map[_0x41d3ef(0x16d)](),document['getElementById'](_0x41d3ef(0x20a))['click']();}function setRoundtrip(){roundtripMode===!![]?roundtripMode=![]:roundtripMode=!![];}function setUnitSystem(){imperialUnits===![]?imperialUnits=!![]:imperialUnits=![];}function downloadRoute(){var _0x3a339b=_0x3ae238,_0x23ff32=myGpx,_0x8526e1=document[_0x3a339b(0x12c)]('a');_0x8526e1[_0x3a339b(0x169)]='data:attachment/gpx,'+encodeURI(_0x23ff32),_0x8526e1['target']=_0x3a339b(0x1d5),_0x8526e1['download']=''+new Date()['toISOString']()['slice'](0x0,0xa)+'_route.gpx',_0x8526e1[_0x3a339b(0x20b)]();var _0x5c024f=myCsvWp[_0x3a339b(0x16e)](_0x34beed=>_0x34beed[_0x3a339b(0x16e)](_0x5f42bb=>typeof _0x5f42bb===_0x3a339b(0x1a2)&&_0x5f42bb[_0x3a339b(0x1d8)](',')>=0x0?'\x22'+_0x5f42bb+'\x22':String(_0x5f42bb))[_0x3a339b(0x109)](','))[_0x3a339b(0x109)]('\x0a'),_0x101872=document[_0x3a339b(0x12c)]('a');_0x101872[_0x3a339b(0x169)]=_0x3a339b(0x207)+encodeURI(_0x5c024f),_0x101872['target']='_blank',_0x101872['download']=''+new Date()['toISOString']()[_0x3a339b(0x171)](0x0,0xa)+_0x3a339b(0x198),_0x101872[_0x3a339b(0x20b)]();}function createPdf(){var _0x46169d=_0x3ae238;const {jsPDF:_0x319c4e}=window['jspdf'],_0x2cdb9f=new _0x319c4e({'orientation':'p','unit':'mm','format':'a4','putOnlyUsedFonts':!![],'floatPrecision':0x10});_0x2cdb9f[_0x46169d(0x159)]({'title':_0x46169d(0x18f),'subject':'This\x20is\x20the\x20subject','author':'Me','keywords':_0x46169d(0x172),'creator':_0x46169d(0x108),'date':new Date()[_0x46169d(0x208)]()[_0x46169d(0x171)](0x0,0xa)}),_0x2cdb9f['setFontSize'](0xb);let _0xbd9861=[],_0x11d653=[];const _0x1e9def=document[_0x46169d(0x19f)](_0x46169d(0x1c3));for(i=0x0;i<currentMarkers[_0x46169d(0x12d)];i++){_0xbd9861['push'](_0x1e9def[i][_0x46169d(0x177)]);}for(i=currentMarkers[_0x46169d(0x12d)];i<_0x1e9def['length'];i++){_0x11d653['push'](_0x1e9def[i][_0x46169d(0x177)]);}function _0x13db2f(_0x492afa,_0x3c52ef,_0x18cef4){var _0x298493=_0x46169d;return _0x492afa['split'](_0x3c52ef,_0x18cef4)[_0x298493(0x109)](_0x3c52ef)[_0x298493(0x12d)];}let _0x1bbe18=0x19,_0x4de8a3=0xa;document[_0x46169d(0x1a7)](_0x46169d(0x1fd))[_0x46169d(0x20b)](),_0x2cdb9f[_0x46169d(0x13e)](_0x46169d(0x18d)+summary[0x0],0x19,_0x4de8a3),_0x4de8a3+=0x5,_0x2cdb9f[_0x46169d(0x13e)](_0x46169d(0x1ff)+summary[0x1]+'min',0x19,_0x4de8a3),_0x4de8a3+=0x5,_0x2cdb9f[_0x46169d(0x13e)](_0x46169d(0xea)+summary[0x2],0x19,_0x4de8a3),_0x4de8a3+=0xa,_0x2cdb9f['setFont'](undefined,_0x46169d(0x131))[_0x46169d(0x13e)](_0x46169d(0x121),0x19,_0x4de8a3)[_0x46169d(0xce)](undefined,_0x46169d(0x167)),_0x4de8a3+=0x5;if(_0xbd9861[0x0][_0x46169d(0x12d)]>0x50){var _0x46a03b=_0x2cdb9f[_0x46169d(0xfc)](_0xbd9861[0x0],0x50);_0x2cdb9f[_0x46169d(0x13e)](_0x46a03b,0x19,_0x4de8a3),_0x4de8a3+=0x14;}else _0x2cdb9f['text'](_0xbd9861[0x0],_0x1bbe18,_0x4de8a3),_0x4de8a3+=0x14;_0x2cdb9f[_0x46169d(0xce)](undefined,_0x46169d(0x131))[_0x46169d(0x13e)](_0x46169d(0x11a),0x19,_0x4de8a3)[_0x46169d(0xce)](undefined,_0x46169d(0x167)),_0x4de8a3+=0x5;if(_0xbd9861[waypoints[0x0][_0x46169d(0x12d)]-0x1][_0x46169d(0x12d)]>0x5f){var _0x46a03b=_0x2cdb9f['splitTextToSize'](_0xbd9861[waypoints[0x0][_0x46169d(0x12d)]-0x1],0x5a);_0x2cdb9f[_0x46169d(0x13e)](_0x46a03b,0x19,_0x4de8a3),_0x4de8a3+=0xf;}else _0x2cdb9f['text'](_0xbd9861[waypoints[0x0][_0x46169d(0x12d)]-0x1],_0x1bbe18,_0x4de8a3),_0x4de8a3+=0xf;_0x4de8a3+=0xa,_0x2cdb9f['setFont'](undefined,_0x46169d(0x131))[_0x46169d(0x13e)]('Waypoints:',0x19,_0x4de8a3)[_0x46169d(0xce)](undefined,_0x46169d(0x167)),_0x4de8a3+=0x5;for(i=0x0;i<_0xbd9861[_0x46169d(0x12d)];i++){if(_0x4de8a3%0x122===0x0||_0x4de8a3%0x12c===0x0)_0x2cdb9f[_0x46169d(0x1f0)](),_0x4de8a3=0xa;else{if(_0xbd9861[i][_0x46169d(0x12d)]>0x5f){var _0x46a03b=_0x2cdb9f[_0x46169d(0xfc)]('['+[i+0x1]+']\x20\x20'+_0xbd9861[i],0x5a);_0x2cdb9f[_0x46169d(0x13e)](_0x46a03b,0x19,_0x4de8a3),_0x4de8a3+=0x14;}else _0x2cdb9f[_0x46169d(0x13e)]('['+[i+0x1]+_0x46169d(0x14b)+_0xbd9861[i],_0x1bbe18,_0x4de8a3),_0x4de8a3+=0xa;}}_0x4de8a3+=0x5,_0x2cdb9f[_0x46169d(0xce)](undefined,_0x46169d(0x131))[_0x46169d(0x13e)](_0x46169d(0x11f),0x19,_0x4de8a3)[_0x46169d(0xce)](undefined,_0x46169d(0x167)),_0x4de8a3+=0x5;for(i=0x0;i<_0x11d653[_0x46169d(0x12d)];i++){if(_0x4de8a3%0x122===0x0||_0x4de8a3%0x127===0x0){_0x2cdb9f[_0x46169d(0x1f0)](),_0x4de8a3=0xa;var _0xd83899=_0x11d653[i],_0x22bce2=_0x13db2f(_0xd83899,'\x0a',0x1),_0x1fe44f=_0x13db2f(_0xd83899,'\x0a',0x2),_0x28b2d5=['['+_0xd83899['slice'](0x0,_0x22bce2)+_0x46169d(0x14b)+_0xd83899[_0x46169d(0x171)](_0x22bce2+0x1,_0x1fe44f)+'\x20('+_0xd83899[_0x46169d(0x171)](_0x1fe44f+0x1,_0xd83899[_0x46169d(0x12d)])+')'];_0x2cdb9f[_0x46169d(0x13e)](_0x28b2d5,0x19,_0x4de8a3),_0x4de8a3+=0x5;}else{var _0xd83899=_0x11d653[i],_0x22bce2=_0x13db2f(_0xd83899,'\x0a',0x1),_0x1fe44f=_0x13db2f(_0xd83899,'\x0a',0x2),_0x28b2d5=['['+_0xd83899[_0x46169d(0x171)](0x0,_0x22bce2)+']\x20\x20'+_0xd83899[_0x46169d(0x171)](_0x22bce2+0x1,_0x1fe44f)+'\x20('+_0xd83899[_0x46169d(0x171)](_0x1fe44f+0x1,_0xd83899[_0x46169d(0x12d)])+')'];_0x2cdb9f[_0x46169d(0x13e)](_0x28b2d5,0x19,_0x4de8a3),_0x4de8a3+=0x5;}}_0x2cdb9f['save'](new Date()[_0x46169d(0x208)]()[_0x46169d(0x171)](0x0,0xa)+'_route.pdf');}function createMapsUrl(){var _0x459c73=_0x3ae238;const _0x457817='https://'+_0x459c73(0xfd)+'google.com'+'/maps/dir/';let _0x14147b=[];for(i=0x0;i<waypoints[0x0]['length'];i++){_0x14147b['push']([waypoints[0x0][i][_0x459c73(0x1e1)][0x1],waypoints[0x0][i][_0x459c73(0x1e1)][0x0]]);}const _0xc52a61=_0x457817['concat'](_0x14147b[_0x459c73(0x109)]('/'));window[_0x459c73(0x16c)](_0xc52a61);}function returnDistanceFormat(_0x502456){var _0x2697fb=_0x3ae238;if(imperialUnits===![]){if(_0x502456==0x0)return'🏁';return _0x502456<=0x3e8?Math['round'](_0x502456)+'m':Math[_0x2697fb(0xd6)](_0x502456/0x3e8)+'km';}else{if(imperialUnits===!![]){if(_0x502456==0x0)return'🏁';return _0x502456*3.28084<=0x14a0?Math[_0x2697fb(0xd6)](_0x502456*3.28084)+'ft':Math[_0x2697fb(0xd6)](_0x502456*3.28084/0x14a0)+'mi';}}}document[_0x3ae238(0x115)](_0x3ae238(0x1e7),setMap());function setMap(){var _0xe9fedd=_0x3ae238;async function _0x2c22ec(_0x5546ed){var _0x2a3ae1=_0x48e2;const _0x5316aa=await fetch(_0x5546ed);return await _0x5316aa[_0x2a3ae1(0x191)]();}_0x2c22ec(_0xe9fedd(0x1e2))['then'](_0x2640b6=>{var _0x45a0ac=_0xe9fedd;for(i=0x0;i<_0x2640b6['length'];i++){if(_0x2640b6[i]['timezone']===Intl[_0x45a0ac(0x1c9)]()[_0x45a0ac(0xf0)]()[_0x45a0ac(0x1c1)]){map['setView']([_0x2640b6[i][_0x45a0ac(0x130)],_0x2640b6[i]['lng']],0x3);break;}}});}function copyTextToClipboard(_0x21ed90){var _0x225b45=_0x3ae238;_0x21ed90[_0x225b45(0x1da)]='<i\x20class=\x22bi\x20bi-clipboard-check-fill\x22></i>';let _0x1f9a2f=_0x21ed90['id'];navigator[_0x225b45(0x19a)][_0x225b45(0xf8)](_0x1f9a2f);const _0x29a0d6=bootstrap[_0x225b45(0x174)][_0x225b45(0x168)](_0x21ed90);_0x29a0d6[_0x225b45(0x187)]({'.tooltip-inner':_0x225b45(0x188)});}document['querySelector'](_0x3ae238(0x1b3))[_0x3ae238(0x115)](_0x3ae238(0x20b),()=>{var _0x319dcf=_0x3ae238;document[_0x319dcf(0x1bb)](_0x319dcf(0x16a))[_0x319dcf(0x197)][_0x319dcf(0xef)](_0x319dcf(0x1e9)),document['getElementById'](_0x319dcf(0x190))[_0x319dcf(0x197)][_0x319dcf(0xef)](_0x319dcf(0xd3));});function clearSearchBar(){var _0x578d2b=_0x3ae238;document[_0x578d2b(0x1a7)](_0x578d2b(0x148))[_0x578d2b(0x10c)]='',document['getElementById']('card')[_0x578d2b(0x1da)]='',searchDropdown=[],coordTouples=[];}function filterListitems(){var _0x1b825b=_0x3ae238,_0x19a779=document[_0x1b825b(0x1a7)]('listitems'),_0x2097fd=_0x19a779[_0x1b825b(0xd2)](_0x1b825b(0x13a)),_0x50dc2c=document['getElementById']('filterInput'),_0x48479d=_0x50dc2c[_0x1b825b(0x10c)][_0x1b825b(0x15d)](),_0xd710c;for(i=0x0;i<_0x2097fd[_0x1b825b(0x12d)];i++){p=_0x2097fd[i][_0x1b825b(0xd2)]('p')[0x0],_0xd710c=p['textContent']||p[_0x1b825b(0x177)],_0xd710c[_0x1b825b(0x15d)]()[_0x1b825b(0x1d8)](_0x48479d)>-0x1?(_0x2097fd[i][_0x1b825b(0x1a4)]['classList'][_0x1b825b(0xdd)](_0x1b825b(0xf1)),_0x2097fd[i][_0x1b825b(0x1a4)][_0x1b825b(0x197)][_0x1b825b(0x15a)](_0x1b825b(0xe1))):(_0x2097fd[i][_0x1b825b(0x1a4)][_0x1b825b(0x197)][_0x1b825b(0xdd)]('d-flex'),_0x2097fd[i][_0x1b825b(0x1a4)][_0x1b825b(0x197)][_0x1b825b(0x15a)]('d-none'));}}function sortListIitems(){var _0x29ee15=_0x3ae238;const _0x5698f9=document['getElementById'](_0x29ee15(0x13d))['getElementsByTagName']('a');let _0x2965f6=[],_0x376abf=[];for(i=0x0;i<_0x5698f9[_0x29ee15(0x12d)];i++){_0x2965f6['push'](_0x5698f9[i]);}_0x2965f6[_0x29ee15(0x15b)]((_0x4c153a,_0x2cea19)=>_0x4c153a[_0x29ee15(0x177)]['toUpperCase']()[_0x29ee15(0x103)](_0x2cea19[_0x29ee15(0x177)]['toUpperCase']())),document['getElementById'](_0x29ee15(0x13d))[_0x29ee15(0x1da)]='';for(let _0x4b4a3f=0x0;_0x4b4a3f<_0x2965f6[_0x29ee15(0x12d)];_0x4b4a3f++){_0x2965f6[_0x4b4a3f]['setAttribute']('id','listitem'+parseInt(_0x4b4a3f)),document['getElementById'](_0x29ee15(0x13d))[_0x29ee15(0x183)](_0x2965f6[_0x4b4a3f]),_0x376abf['push'](_0x2965f6[_0x4b4a3f]['children'][0x0]['id']);}currentMarkers=_0x376abf[_0x29ee15(0x195)]((_0x3468ab,_0x410c64)=>_0x3468ab[_0x29ee15(0x161)](currentMarkers[_0x29ee15(0xd1)](_0x25f995=>_0x25f995[_0x29ee15(0x10a)]==_0x410c64)),[]);}function _0x48e2(_0x34b8bb,_0x2d7e58){var _0x328a03=_0x328a();return _0x48e2=function(_0x48e205,_0x4b02ae){_0x48e205=_0x48e205-0xcd;var _0x428bc0=_0x328a03[_0x48e205];return _0x428bc0;},_0x48e2(_0x34b8bb,_0x2d7e58);}function deleteFilterInput(){document['getElementById']('filterInput')['value']='',filterListitems();}document['getElementById'](_0x3ae238(0x20c))[_0x3ae238(0x115)](_0x3ae238(0x20b),setDayNightUi),document[_0x3ae238(0x1a7)](_0x3ae238(0xd7))[_0x3ae238(0x115)]('click',setDayNightUi);function setDayNightUi(){var _0xa4a0a7=_0x3ae238;document[_0xa4a0a7(0xed)][_0xa4a0a7(0x116)](_0xa4a0a7(0x196))==_0xa4a0a7(0x11c)?(document[_0xa4a0a7(0x1a7)]('navbar')[_0xa4a0a7(0x197)][_0xa4a0a7(0x15a)](_0xa4a0a7(0x10b)),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x122))[_0xa4a0a7(0x197)][_0xa4a0a7(0xdd)](_0xa4a0a7(0x13f)),document[_0xa4a0a7(0x1a7)]('sidebar-wrapper')[_0xa4a0a7(0x197)][_0xa4a0a7(0x15a)](_0xa4a0a7(0x10b)),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x185))[_0xa4a0a7(0x197)]['remove'](_0xa4a0a7(0x13f)),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x1d7))[_0xa4a0a7(0x197)][_0xa4a0a7(0x15a)]('btn-light'),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x1d7))[_0xa4a0a7(0x197)][_0xa4a0a7(0xdd)](_0xa4a0a7(0xe9)),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x138))[_0xa4a0a7(0x197)]['add'](_0xa4a0a7(0x141)),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x138))['classList'][_0xa4a0a7(0xdd)]('btn-dark'),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x15e))['classList'][_0xa4a0a7(0x15a)](_0xa4a0a7(0x141)),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x15e))[_0xa4a0a7(0x197)][_0xa4a0a7(0xdd)]('btn-dark'),document[_0xa4a0a7(0x1a7)]('nightBtn')[_0xa4a0a7(0x197)]['add'](_0xa4a0a7(0x141)),document[_0xa4a0a7(0x1a7)]('nightBtn')[_0xa4a0a7(0x197)][_0xa4a0a7(0xdd)](_0xa4a0a7(0xe9)),document['getElementById'](_0xa4a0a7(0x1f8))[_0xa4a0a7(0x197)][_0xa4a0a7(0x15a)](_0xa4a0a7(0x141)),document[_0xa4a0a7(0x1a7)]('questionBtn')[_0xa4a0a7(0x197)][_0xa4a0a7(0xdd)]('btn-dark'),document[_0xa4a0a7(0x1a7)]('moonIcon')[_0xa4a0a7(0x197)][_0xa4a0a7(0x15a)](_0xa4a0a7(0xe7)),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x1a5))[_0xa4a0a7(0x197)][_0xa4a0a7(0xdd)](_0xa4a0a7(0x104)),document[_0xa4a0a7(0xed)]['setAttribute'](_0xa4a0a7(0x196),_0xa4a0a7(0x1df)),document[_0xa4a0a7(0x1a7)]('navbar')[_0xa4a0a7(0x1ae)](_0xa4a0a7(0x196),_0xa4a0a7(0x1df)),document[_0xa4a0a7(0x160)][_0xa4a0a7(0x197)][_0xa4a0a7(0xef)](_0xa4a0a7(0x124))):(document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x122))[_0xa4a0a7(0x197)]['add'](_0xa4a0a7(0x13f)),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x122))['classList'][_0xa4a0a7(0xdd)](_0xa4a0a7(0x10b)),document[_0xa4a0a7(0x1a7)]('sidebar-wrapper')[_0xa4a0a7(0x197)][_0xa4a0a7(0x15a)](_0xa4a0a7(0x13f)),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x185))['classList'][_0xa4a0a7(0xdd)](_0xa4a0a7(0x10b)),document['getElementById'](_0xa4a0a7(0x1d7))[_0xa4a0a7(0x197)][_0xa4a0a7(0x15a)](_0xa4a0a7(0xe9)),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x1d7))[_0xa4a0a7(0x197)][_0xa4a0a7(0xdd)](_0xa4a0a7(0x141)),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x138))[_0xa4a0a7(0x197)][_0xa4a0a7(0x15a)](_0xa4a0a7(0xe9)),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x138))['classList'][_0xa4a0a7(0xdd)](_0xa4a0a7(0x141)),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x15e))[_0xa4a0a7(0x197)][_0xa4a0a7(0x15a)](_0xa4a0a7(0xe9)),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x15e))[_0xa4a0a7(0x197)][_0xa4a0a7(0xdd)]('btn-light'),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x20c))[_0xa4a0a7(0x197)]['add']('btn-dark'),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x20c))[_0xa4a0a7(0x197)][_0xa4a0a7(0xdd)](_0xa4a0a7(0x141)),document['getElementById'](_0xa4a0a7(0x1f8))['classList'][_0xa4a0a7(0x15a)](_0xa4a0a7(0xe9)),document['getElementById'](_0xa4a0a7(0x1f8))['classList'][_0xa4a0a7(0xdd)]('btn-light'),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x1a5))['classList'][_0xa4a0a7(0x15a)](_0xa4a0a7(0x104)),document[_0xa4a0a7(0x1a7)](_0xa4a0a7(0x1a5))[_0xa4a0a7(0x197)]['remove'](_0xa4a0a7(0xe7)),document[_0xa4a0a7(0xed)][_0xa4a0a7(0x1ae)](_0xa4a0a7(0x196),_0xa4a0a7(0x11c)),document['getElementById'](_0xa4a0a7(0x122))['setAttribute'](_0xa4a0a7(0x196),_0xa4a0a7(0x11c)),document['body']['classList']['toggle']('c_darkmode'));}document[_0x3ae238(0x115)](_0x3ae238(0x1e7),getDayNightUi,![]);function getDayNightUi(){var _0x28d481=_0x3ae238;window[_0x28d481(0x1af)](_0x28d481(0x162))[_0x28d481(0x101)]?(document[_0x28d481(0x1a7)]('navbar')['classList'][_0x28d481(0x15a)](_0x28d481(0x13f)),document[_0x28d481(0x1a7)](_0x28d481(0x122))[_0x28d481(0x197)][_0x28d481(0xdd)](_0x28d481(0x10b)),document[_0x28d481(0x1a7)](_0x28d481(0x185))['classList'][_0x28d481(0x15a)](_0x28d481(0x13f)),document['getElementById'](_0x28d481(0x185))[_0x28d481(0x197)][_0x28d481(0xdd)](_0x28d481(0x10b)),document[_0x28d481(0x1a7)]('mapLayerBtn')[_0x28d481(0x197)][_0x28d481(0x15a)](_0x28d481(0xe9)),document[_0x28d481(0x1a7)](_0x28d481(0x1d7))[_0x28d481(0x197)]['remove'](_0x28d481(0x141)),document['getElementById'](_0x28d481(0x138))[_0x28d481(0x197)][_0x28d481(0x15a)]('btn-dark'),document[_0x28d481(0x1a7)](_0x28d481(0x138))['classList']['remove']('btn-light'),document[_0x28d481(0x1a7)](_0x28d481(0x15e))[_0x28d481(0x197)]['add']('btn-dark'),document[_0x28d481(0x1a7)](_0x28d481(0x15e))[_0x28d481(0x197)][_0x28d481(0xdd)](_0x28d481(0x141)),document[_0x28d481(0x1a7)](_0x28d481(0x20c))[_0x28d481(0x197)][_0x28d481(0x15a)](_0x28d481(0xe9)),document[_0x28d481(0x1a7)](_0x28d481(0x20c))[_0x28d481(0x197)][_0x28d481(0xdd)](_0x28d481(0x141)),document[_0x28d481(0x1a7)](_0x28d481(0x1f8))[_0x28d481(0x197)][_0x28d481(0x15a)](_0x28d481(0xe9)),document[_0x28d481(0x1a7)](_0x28d481(0x1f8))[_0x28d481(0x197)]['remove'](_0x28d481(0x141)),document[_0x28d481(0x1a7)](_0x28d481(0x1a5))[_0x28d481(0x197)][_0x28d481(0x15a)](_0x28d481(0x104)),document['getElementById']('moonIcon')[_0x28d481(0x197)][_0x28d481(0xdd)](_0x28d481(0xe7)),document[_0x28d481(0xed)][_0x28d481(0x1ae)](_0x28d481(0x196),_0x28d481(0x11c)),document['getElementById'](_0x28d481(0x122))[_0x28d481(0x1ae)](_0x28d481(0x196),_0x28d481(0x11c)),document['body'][_0x28d481(0x197)]['toggle'](_0x28d481(0x124))):(document[_0x28d481(0x1a7)](_0x28d481(0x122))['classList'][_0x28d481(0x15a)](_0x28d481(0x10b)),document['getElementById'](_0x28d481(0x122))[_0x28d481(0x197)]['remove'](_0x28d481(0x13f)),document[_0x28d481(0x1a7)](_0x28d481(0x185))[_0x28d481(0x197)]['add']('bg-light'),document['getElementById'](_0x28d481(0x185))[_0x28d481(0x197)][_0x28d481(0xdd)]('bg-dark'),document[_0x28d481(0x1a7)](_0x28d481(0x1d7))[_0x28d481(0x197)]['add'](_0x28d481(0x141)),document[_0x28d481(0x1a7)](_0x28d481(0x1d7))[_0x28d481(0x197)][_0x28d481(0xdd)](_0x28d481(0xe9)),document['getElementById'](_0x28d481(0x138))[_0x28d481(0x197)][_0x28d481(0x15a)]('btn-light'),document[_0x28d481(0x1a7)]('transportBtn')['classList']['remove'](_0x28d481(0xe9)),document['getElementById'](_0x28d481(0x15e))['classList'][_0x28d481(0x15a)](_0x28d481(0x141)),document[_0x28d481(0x1a7)]('settingsBtn')[_0x28d481(0x197)]['remove']('btn-dark'),document['getElementById']('nightBtn')['classList']['add']('btn-light'),document[_0x28d481(0x1a7)](_0x28d481(0x20c))['classList']['remove'](_0x28d481(0xe9)),document[_0x28d481(0x1a7)]('questionBtn')['classList'][_0x28d481(0x15a)](_0x28d481(0x141)),document['getElementById'](_0x28d481(0x1f8))['classList'][_0x28d481(0xdd)](_0x28d481(0xe9)),document[_0x28d481(0x1a7)](_0x28d481(0x1a5))[_0x28d481(0x197)][_0x28d481(0x15a)]('bi-moon-stars-fill'),document[_0x28d481(0x1a7)](_0x28d481(0x1a5))[_0x28d481(0x197)]['remove'](_0x28d481(0x104)),document[_0x28d481(0xed)][_0x28d481(0x1ae)](_0x28d481(0x196),_0x28d481(0x1df)),document[_0x28d481(0x1a7)]('navbar')[_0x28d481(0x1ae)](_0x28d481(0x196),_0x28d481(0x1df)));}document['addEventListener'](_0x3ae238(0x1e7),toggleSidebar,![]);function toggleSidebar(){var _0x15606b=_0x3ae238;document[_0x15606b(0x1a7)](_0x15606b(0xfa))['click']();}document[_0x3ae238(0x115)](_0x3ae238(0x1e7),setRadioState,![]);function setRadioState(){var _0x3bbaf4=_0x3ae238;geolocSwitch===![]?document[_0x3bbaf4(0x1a7)](_0x3bbaf4(0x1e6))['checked']=![]:document['getElementById'](_0x3bbaf4(0x1e6))[_0x3bbaf4(0xfe)]=!![],imperialUnits===![]?document[_0x3bbaf4(0x1a7)](_0x3bbaf4(0x155))['checked']=![]:document[_0x3bbaf4(0x1a7)](_0x3bbaf4(0x155))['checked']=!![],roundtripMode===![]?document[_0x3bbaf4(0x1a7)](_0x3bbaf4(0x184))[_0x3bbaf4(0xfe)]=![]:document[_0x3bbaf4(0x1a7)]('flexSwitchCheckDefault8')[_0x3bbaf4(0xfe)]=!![];}document['addEventListener'](_0x3ae238(0x1e7),setTransportState,![]);function setTransportState(){var _0x14a61a=_0x3ae238;switch(transportMode){case _0x14a61a(0x143):document[_0x14a61a(0x1a7)]('driving')[_0x14a61a(0xfe)]=!![];break;case _0x14a61a(0x136):document[_0x14a61a(0x1a7)]('bike')['checked']=!![];break;case _0x14a61a(0x1f9):document['getElementById']('foot')['checked']=!![];break;default:document[_0x14a61a(0x1a7)]('driving')['checked']=!![];break;}}window[_0x3ae238(0x1af)]('(max-width:\x201000px)')[_0x3ae238(0x115)]('change',function(_0x6cedd1){var _0x4b5851=_0x3ae238;if(_0x6cedd1[_0x4b5851(0x101)]){}else return![];});var fileInput1=document[_0x3ae238(0x1a7)](_0x3ae238(0x1cc));fileInput1[_0x3ae238(0x115)](_0x3ae238(0x194),async function main(){var _0x43f1b8=_0x3ae238;try{const _0x445cb2=await toJson();csvData=[],csvData[_0x43f1b8(0x20d)](_0x445cb2),modCsvData();}catch(_0x31e2d6){console[_0x43f1b8(0x1d2)](_0x43f1b8(0x1be),_0x31e2d6);}});function toJson(){var _0x389259=_0x3ae238,_0x18740f=fileInput1[_0x389259(0x153)][0x0];return new Promise((_0x16521a,_0x157929)=>{var _0x11d2a3=_0x389259;Papa[_0x11d2a3(0x146)](_0x18740f,{'complete'(_0x28650f,_0x45c429){var _0x2dc971=_0x11d2a3;_0x16521a(_0x28650f[_0x2dc971(0x128)]);},'error'(_0x24f940,_0x482083){_0x157929(_0x24f940);}});});}function modCsvData(){var _0x92f00c=_0x3ae238;let _0x15115e=[],_0x26bfec=0x0,_0xdf49d6=0x0;for(i=0x0;i<csvData[0x0][_0x92f00c(0x12d)];i++){_0x15115e[_0x92f00c(0x20d)](csvData[0x0][i]['join']());}setInterval(_0x2558d2,0x9c4);function _0x2558d2(){var _0x5ac79f=_0x92f00c;if(_0x26bfec<_0x15115e[_0x5ac79f(0x12d)])return _0x26bfec++,new Promise(function(_0x398996,_0x3f98ca){var _0x48286c=_0x5ac79f;axios[_0x48286c(0x15f)](_0x48286c(0x1d6)+_0x48286c(0x113)+_0x15115e[_0x26bfec]+_0x48286c(0x19d))[_0x48286c(0xe5)](_0x1f4b7e=>{var _0x682b46=_0x48286c,_0x3f5816=_0x1f4b7e['data'];_0x398996(_0x3f5816[0x0]);if(_0x3f5816[0x0]===undefined)console[_0x682b46(0x19e)](_0x682b46(0x1b5)),_0xdf49d6++;else{_0x3962d1();async function _0x3962d1(){var _0x2017ce=_0x682b46;const _0x1a70ca=[_0x3f5816[0x0][_0x2017ce(0x130)],_0x3f5816[0x0][_0x2017ce(0x106)]];var _0xd8c39f=new L['marker'](_0x1a70ca,{'icon':L[_0x2017ce(0x1c6)][_0x2017ce(0xe2)](options)})[_0x2017ce(0x111)](map);currentMarkers['push'](_0xd8c39f);var _0x423503=await reverseGeocode(_0x3f5816[0x0]['lat'],_0x3f5816[0x0]['lon']),_0xb2870f=getDistance(userLoc,[_0x3f5816[0x0][_0x2017ce(0x130)],_0x3f5816[0x0][_0x2017ce(0x106)]]),_0x32f524;userLoc[_0x2017ce(0x12d)]===0x0?_0x32f524='':_0x32f524='▸'+_0xb2870f+_0x2017ce(0x147),document['getElementById'](_0x2017ce(0x13d))[_0x2017ce(0x1da)]+=_0x2017ce(0x1c5)+(currentMarkers[_0x2017ce(0x12d)]-0x1)+'\x22\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<section\x20class=\x22d-flex\x20flex-column\x22\x20style=\x22flex:\x2011\x201\x200;\x22>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<p\x20class=\x22mb-1\x20px-1\x22>'+_0x423503+_0x2017ce(0x123)+_0x32f524+_0x2017ce(0x203)+currentMarkers[currentMarkers['length']-0x1]['_leaflet_id']+_0x2017ce(0x140)+currentMarkers[currentMarkers[_0x2017ce(0x12d)]-0x1][_0x2017ce(0x163)][_0x2017ce(0x130)]+',\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20'+currentMarkers[currentMarkers[_0x2017ce(0x12d)]-0x1]['_latlng']['lng']+_0x2017ce(0x1f4),markerCount++,document[_0x2017ce(0x1a7)](_0x2017ce(0x12a))[_0x2017ce(0x1da)]=''+markerCount,document['getElementById'](_0x2017ce(0x119))['style'][_0x2017ce(0x175)]='none';}}},_0x34d0f6=>{_0x3f98ca(_0x34d0f6);}),document[_0x48286c(0x1a7)](_0x48286c(0x120))[_0x48286c(0x20b)]();});else return;}}
+      // PP & ToS
+      function pastePriv() {
+        document.getElementById("contentPp").innerHTML = "";
+        document.getElementById("contentPp").innerHTML += `
+          <h6><b>Types of Data Automatically Collected</b></h6>
+          <p>Usage Data is collected automatically when visiting this website. Usage data may include information such as your Device's Internet
+              Protocol address (e.g. IP address), browser type, browser version, the functionalities of your use, the time and date of your
+              visit, the time spent on those pages, unique device identifiers and other diagnostic data.
+              When you access this website by or through a mobile device, We may collect certain information automatically, including, but not limited
+              to, the type of mobile device you use, your mobile device unique ID, the IP address of your mobile device, your mobile operating system,
+              the type of mobile Internet browser you use, unique device identifiers and other diagnostic data. We may also collect information that
+              your browser sends whenever you visit, use or access our website by or through a mobile device.</p>
+          <h6><b>Tracking Technologies and Cookies</b></h6>
+          <p>We use Cookies and similar tracking technologies to track the visitors' activity or store certain information. Tracking
+              technologies used are beacons, tags, and scripts to collect and track information and to improve and analyze this website. The technologies
+              we use may include:</p>
+          <p> Cookies or Browser Cookies: A cookie is a small file placed on your device. You can instruct your browser to refuse all cookies or to indicate when a cookie is being
+              sent. However, if you do not accept cookies, you may not be able to use some parts of our website. Unless you have adjusted your browser
+              setting so that it will refuse cookies, our website may use Cookies.
+          </p>
+          <p> Web Beacons: Certain sections of our website may contain small electronic files known as web beacons (also referred to as clear gifs,
+              pixel tags, and single-pixel gifs) that permit us, for example, to count users who have visited those parts of of a website and for other
+              related website statistics (for example, recording the popularity of a certain section and verifying system integrity).
+          </p>
+          <p>Cookies can be &quot;Persistent&quot; or &quot;Session&quot; Cookies. Persistent cookies remain on your personal computer or
+              mobile device when you go offline, while Session Cookies are deleted as soon as you close your web browser.</p>
+          <h6><b>Strictly necessary Cookies</b></h6>
+          <p>These Cookies are essential to provide you with services available through the website and to enable you to use some of its
+              features. They help to authenticate users and prevent fraudulent use of website. Without these Cookies, the services that you have
+              asked for cannot be provided, and We only use these Cookies to securely provide you with those services.</p>
+          <h6><b>Performance and Analytics Cookies</b></h6>
+          <p>These Cookies are used to track information about traffic to the website and how users use the website. The information
+              gathered via these Cookies may directly or indirectly identify you as an individual visitor. This is because the information collected is
+              typically linked to a pseudonymous identifier associated with the device you use to access the website. We may also use these Cookies
+              to test new functions, features or layouts of our website in order to see how our visitors react to them.</p>
+          <h6><b>Advertising or Targeting Cookies</b></h6>
+          <p>These Cookies allow us or our partners to remember choices you make when you use the website, such as remembering your login details or
+              language preference. The purpose of these Cookies is to provide you with a more personal experience and to avoid you having to re-enter
+              your preferences every time you use the website. Currently these cookies are not used.</p>
+          <h6><b>Links to Other websites</b></h6>
+          <p>Our Service may contain links to other websites that are not operated by Us. If you click on a third party link, you will be
+              directed to that third party's site. We strongly advise you to review
+              the Privacy Policy of every site you visit. We have no control over and
+              assume no responsibility for the content, privacy policies or practices of any third party sites or
+              services.</p>
+          `;
+      }
+
+      function pasteTerms() {
+        document.getElementById("contentTos").innerHTML = "";
+        document.getElementById("contentTos").innerHTML += `
+          <h6><b>Introduction</b></h6>
+          <p>By accessing this website you are agreeing to be bound by these website Terms and Conditions of Use and
+          agree that you are responsible for the agreement with any applicable local laws. This website operates under the name "ShortestRoute" (“we,” “us,” or “our”). These Terms of Use constitute a legally binding agreement made between you, whether personally or on behalf of an entity (“you”) and concerning your access to and use of the website and the services.
+          You agree that by accessing the services, you have read, understood, and agree to be bound by all of these Terms of Use.
+          The materials contained in this website are protected by copyright and trade mark law. If you do not agree with any terms, you are expressly prohibited from using our services and must discontinue use immediately.</p>
+          <h6><b>Use License</b></h5>
+          <p> Our website operates not for profit and free as in "freeware". This implies there is no distribution or monetary costs to visitors. Permission is granted to temporarily use the online version on our website for personal, non-commercial transitory application only. This is the grant of a license, not a transfer of title, and under this license you may not:</p>
+          <p>(1) Modify, transfer or copy our created materials such as source code, graphics, user interfaces, texts, photographs, graphics, logos;<br>
+                          (2) Use of our website for any commercial purpose or for any public display without notice;<br>
+                          (3) Attempt to reverse engineer, refactor or duplicate the source code of our website;<br>
+                          (4) Remove any copyright or further notations from our materials;<br>
+                          (5) Transferring the materials to another person or &quot;mirror&quot; the materials on any other server.</p>
+          <p>This will allow ShortestRoute to terminate upon violations of any of these restrictions. Upon termination, your viewing right will also be
+              terminated or will be banned and you have to destroy any materials of us in your possession whether it is printed or electronic format.</p>
+          <h6><b>Disclaimer</b></h5>
+          <p>All the materials on our website are provided &quot;as is&quot;. We provide no warranties, may it be expressed or implied, therefore
+              negates all other warranties. Furthermore, ShortestRoute does not make any representations concerning the accuracy or reliability of the use of
+              the materials on its website or otherwise relating to such materials or any sites linked to this website. The services are intended for business users who are at least 18 years old. Persons under the age of 18 are not permitted to use or register for the services.</p>
+          <h6><b>Limitations</b></h5>
+          <p>ShortestRoute or its partner sites will not be hold accountable for any damages that will arise with the use or inability to use the materials on
+              our website, even if ShortestRoute or an authorize representative of this website has been notified, orally or written, of the possibility of
+              such damage. Some jurisdiction does not allow limitations on implied warranties or limitations of liability for incidental damages, these limitations may not apply to you.</p>
+          <h6><b>Revisions and Errata</b></h5>
+          <p>The materials appearing on ShortestRoute may include technical, typographical, or photographic errors. We will not promise that any
+              of the materials in this website are accurate, complete, or current. We may change the materials contained on its website at any time without notice.
+              We do not make any commitment to update the materials.</p>
+          <h6><b>Links</b></h5>
+          <p>We have not reviewed all of the sites linked to its website and is not responsible for the contents of any such linked site. The
+              presence of any link does not imply endorsement by us of the site. The use of any linked website is at the user's own risk.</p>
+          <h6><b>Site Terms of Use Modifications</b></h5>
+          <p>Supplemental terms and conditions or documents that may be posted on the website from time to time are hereby expressly incorporated herein by reference.
+          It is your responsibility to periodically review these Terms of Use to stay informed as each time you access the services, you will be subject to, and will be deemed to have been made aware of and to have accepted, the then applicable Terms of Use.
+           By using this website, you are agreeing to be bound by the current version of these Terms and Conditions of Use.</p>
+          <h6><b>Governing Law</b></h5>
+          <p>Any claim related to ShortestRoute's website shall be governed by the laws of Country without regards to its conflict of law provisions. For further questions or remarks, please contact us.</p>
+          `;
+      }
+    </script>
+      <!-- NoScript fallback -->
+        <noscript>
+          <p>You have disabled JavaScript. Good luck with that!</p>
+        </noscript>
+  </body>
+</html>
